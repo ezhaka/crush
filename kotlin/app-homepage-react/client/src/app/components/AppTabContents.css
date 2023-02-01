@@ -6,3 +6,9 @@
     color: var(--link-color);
     cursor: pointer;
 }
+
+.app-tab-contents {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}

@@ -7,9 +7,15 @@ import fetchSpaceUserToken, {
     UserTokenData
 } from "../service/spaceAuth";
 import Loader from "./Loader";
-import {useState} from "@hookstate/core";
+import {useState as useAsyncState} from "@hookstate/core";
+import {useState} from "react";
 import {onBehalfOfTheAppApiImpl} from "../service/onBehalfOfTheAppApiImpl";
 import {httpGet} from "../service/utils";
+import AsyncSelect from "react-select/async";
+import * as utils from "../service/utils";
+import {Theme} from "react-select";
+import * as theme from "../service/theme";
+import {ChatChannel} from "../service/chatChannel";
 
 interface OnBehalfOfAppTabContentsState {
     userTokenData?: UserTokenData;
@@ -17,7 +23,7 @@ interface OnBehalfOfAppTabContentsState {
 }
 
 export function OnBehalfOfAppTabContents() {
-    const state = useState(() => loadInitialTabState());
+    const state = useAsyncState(() => loadInitialTabState());
 
     if (state.promised) {
         return (<Loader/>);
@@ -39,6 +45,8 @@ export function OnBehalfOfAppTabContents() {
                             )}
                 />
             }
+
+
             <AppTabContents
                 key="OnBehalfOfTheApp"
                 userTokenData={state.userTokenData.get()}

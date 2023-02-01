@@ -24,6 +24,6 @@ fun initDbConnection() {
     )
 
     transaction(connection) {
-        SchemaUtils.createMissingTablesAndColumns(AppInstallation)
+        SchemaUtils.createMissingTablesAndColumns(AppInstallation, IncomingValentine)
     }
 }

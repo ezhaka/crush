@@ -18,6 +18,15 @@ const getChannelListImpl = async (query: string, userTokenData?: UserTokenData) 
     });
 }
 
+export const getProfilesListImpl = async (query?: string, userTokenData?: UserTokenData) => {
+    if (userTokenData === undefined) {
+        throw Error('query or userTokenData is undefined')
+    }
+
+    const responseRaw = await httpGet(`/homepage/get-profiles?query=${query || ''}`, userTokenData.userToken)
+    return await responseRaw.json() as ProfileListResponse
+}
+
 const sendMessageImpl = (channelId?: string, messageText?: string, userTokenData?: UserTokenData) => {
     if (channelId === undefined || messageText === undefined || userTokenData === undefined) {
         return

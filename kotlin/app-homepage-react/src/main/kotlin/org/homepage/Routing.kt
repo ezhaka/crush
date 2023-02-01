@@ -13,11 +13,18 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.homepage.services.GetChannelsService
+import org.homepage.db.IncomingValentine
+import org.homepage.services.*
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
+import space.jetbrains.api.runtime.BatchInfo
 import space.jetbrains.api.runtime.Space
 import space.jetbrains.api.runtime.helpers.RequestAdapter
 import space.jetbrains.api.runtime.helpers.SpaceHttpResponse
 import space.jetbrains.api.runtime.helpers.processPayload
+import space.jetbrains.api.runtime.resources.chats
+import space.jetbrains.api.runtime.resources.teamDirectory
 import space.jetbrains.api.runtime.types.InitPayload
 
 fun Application.configureRouting() {
@@ -62,10 +69,55 @@ fun Application.configureRouting() {
             }
         }
 
+        get<Routes.GetProfiles> { params ->
+            runAuthorized { spaceTokenInfo ->
+                val profiles = spaceTokenInfo.appSpaceClient().teamDirectory.profiles.getAllProfiles(
+                    query = params.query,
+                    batchInfo = BatchInfo(offset = null, batchSize = 50)
+                )
+                    .data
+                    .map { Profile(it.id, it.name.firstName, it.name.lastName) }
+                call.respond(HttpStatusCode.OK, ProfileListResponse(profiles))
+            }
+        }
+
         post<Routes.SendMessage> { params ->
             runAuthorized { spaceTokenInfo ->
                 SendMessageService(spaceTokenInfo).sendMessage(params.channelId, params.messageText)
                 call.respond(HttpStatusCode.OK)
+            }
+        }
+
+        post<Routes.SendValentine> { params ->
+            runAuthorized { spaceTokenInfo ->
+                // TODO
+                println("SendValentine spaceUserId = ${spaceTokenInfo.spaceUserId}")
+
+                transaction {
+                    IncomingValentine.insert {
+                        it[this.receiver] = params.receiverId
+                        it[this.message] = params.messageText
+                    }
+                }
+
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+
+        get<Routes.GetIncomingValentines> { params ->
+            runAuthorized { spaceTokenInfo ->
+                // TODO
+                println("GetIncomingValentines spaceUserId = ${spaceTokenInfo.spaceUserId}")
+
+                val valentines = transaction {
+                    IncomingValentine
+                        .select {
+                        IncomingValentine.receiver eq spaceTokenInfo.spaceUserId
+                    }
+                        .map { IncomingValentine(it[IncomingValentine.id].value, it[IncomingValentine.message]) }
+                }
+
+                call.respond(HttpStatusCode.OK, IncomingValentineListResponse(valentines))
             }
         }
 

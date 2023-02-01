@@ -3,14 +3,34 @@ import {AppTabContents} from "./AppTabContents";
 import {onBehalfOfTheUserApiImpl} from "../service/onBehalfOfTheUserApiImpl";
 import {requestUserToken, userPermissionScope, UserTokenData} from "../service/spaceAuth";
 import Loader from "./Loader";
-import {useState} from "@hookstate/core";
+import {useState as useAsyncState} from "@hookstate/core";
+import {useEffect, useState} from "react";
+import {httpGet} from "../service/utils";
 
 interface OnBehalfOfUserTabContentsState {
     userTokenData?: UserTokenData;
 }
 
 export function OnBehalfOfUserTabContents() {
-    const state = useState(() => loadInitialTabState());
+    const state = useAsyncState(() => loadInitialTabState());
+    const [valentines, setValentines] = useState<Array<any>>()
+
+    useEffect(() => {
+        const query = async () => {
+            const token = await loadInitialTabState()
+            let userToken = token.userTokenData?.userToken;
+
+            if (userToken) {
+                const res = await httpGet(`/homepage/get-incoming-valentines`, userToken)
+                const json = await res.json()
+                setValentines(json.data)
+                console.log("get-incoming-valentines", json)
+            } else {
+                console.warn("user token is empty!")
+            }
+        }
+        query()
+    }, [])
 
     if (state.promised) {
         return (<Loader/>);
@@ -18,6 +38,9 @@ export function OnBehalfOfUserTabContents() {
 
     return (
         <>
+            <div>
+                {valentines?.map(v => <div>❤️</div>)}
+            </div>
             {
                 state.userTokenData.get() === undefined &&
                 <WarningBox text="Authorize the app to view channels and send messages on behalf of the current user"

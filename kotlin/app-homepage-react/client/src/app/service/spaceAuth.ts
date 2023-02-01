@@ -65,5 +65,5 @@ async function doRequestAppPermissions(permissionScope: string): Promise<boolean
 /**
  * Permissions scopes are the same in this demo application
  */
-export const userPermissionScope = "global:Channel.ViewChannel global:Channel.PostMessages"
-export const appPermissionScope = "global:Channel.ViewChannel global:Channel.PostMessages"
+export const userPermissionScope = ""
+export const appPermissionScope = "global:Channel.ViewChannel global:Channel.PostMessages global:Profile.View"
