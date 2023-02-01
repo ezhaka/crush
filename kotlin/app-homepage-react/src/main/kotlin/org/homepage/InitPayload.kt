@@ -4,6 +4,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.*
+import kotlinx.serialization.Serializable
 import space.jetbrains.api.runtime.helpers.ProcessingScope
 import space.jetbrains.api.runtime.resources.applications
 import space.jetbrains.api.runtime.types.ApplicationHomepageUiExtensionIn
@@ -17,34 +18,13 @@ suspend fun ProcessingScope.setUiExtensions() {
         contentType(ContentType.Application.Json)
         bearerAuth(client.token().accessToken)
 
-//        setBody(object {
-//            val contextIdentifier = "global"
-//            val extensions = listOf(
-//                object {
-//                    val className = "TopLevelPageUiExtensionIn"
-//                    val displayName = "kek"
-//                    val uniqueCode = "kek"
-//                    val iframeUrl = "http://localhost:8080/space-iframe"
-//                }
-//            )
-//        })
-
-        setBody("{\"contextIdentifier\":\"global\",\"extensions\":[{\"className\":\"TopLevelPageUiExtensionIn\",\"displayName\":\"kek\",\"uniqueCode\":\"kek\",\"iframeUrl\": \"http://localhost:3001/\"}]}")
+        setBody("{\"contextIdentifier\":\"global\",\"extensions\":[" +
+                "{\"className\":\"TopLevelPageUiExtensionIn\",\"displayName\":\"Secret Crush\",\"uniqueCode\":\"crush\",\"iframeUrl\": \"http://localhost:3001/\"}," +
+                "{\"className\":\"SidebarHeaderIconExtensionIn\",\"iframeUrl\": \"http://localhost:3001/\"}" +
+                "]}")
     }
 
-    println(
-     "status: ${res.status}"
-    )
+    // TODO: write to logs
+    println("status: ${res.status}, response: ${res.bodyAsText()}")
 
-    println(
-     "response: ${res.bodyAsText()}"
-    )
-
-//    client.applications.setUiExtensions(
-//        contextIdentifier = GlobalPermissionContextIdentifier,
-//        extensions = listOf(
-////            TopLevelPageUiExtensionIn
-//            ApplicationHomepageUiExtensionIn(iframeUrl = "/space-iframe")
-//        )
-//    )
 }
