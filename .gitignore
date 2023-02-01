@@ -1,7 +1,5 @@
 **/.gradle/
 /.idea/
 **/build/
-**/buildSrc/.gradle/
-**/buildSrc/build/
-**/bin/
-**/obj/
+**/client/package-lock.json
+**/client/node_modules
