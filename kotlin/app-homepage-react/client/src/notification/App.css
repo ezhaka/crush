@@ -1,0 +1,12 @@
+body {
+    margin: 0;
+}
+
+.app {
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+}

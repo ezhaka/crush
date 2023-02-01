@@ -1,16 +1,3 @@
-export const debounce = <F extends (...args: any) => any>(
-    func: F,
-    waitFor: number = 300,
-) => {
-    let timeout: number = 0
-
-    const debounced = (...args: any) => {
-        clearTimeout(timeout)
-        timeout = window.setTimeout(() => func(...args), waitFor)
-    }
-
-    return debounced as (...args: Parameters<F>) => ReturnType<F>
-}
 
 export async function httpGet(path: string, token: string) {
     return await httpRequest('GET', token, path);
@@ -37,12 +24,4 @@ async function httpRequest(method: string, token: string, path: string, body?: o
     }
 
     return await fetch(path, requestInit)
-}
-
-export function openInNewTab(href: string) {
-    Object.assign(document.createElement('a'), {
-        target: '_blank',
-        rel: 'noopener noreferrer',
-        href: href,
-    }).click();
 }

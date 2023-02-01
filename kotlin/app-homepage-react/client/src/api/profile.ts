@@ -7,3 +7,8 @@ interface Profile {
 interface ProfileListResponse {
     data: Profile[]
 }
+
+interface Valentine {
+    id: number;
+    message: string;
+}

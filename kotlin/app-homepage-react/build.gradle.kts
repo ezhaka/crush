@@ -102,7 +102,7 @@ tasks {
     val run by getting(JavaExec::class)
     dockerCompose.isRequiredBy(run)
 
-    run.dependsOn("buildClient")
+//    run.dependsOn("buildClient")
     val distZip by existing {
         dependsOn("buildClient")
     }

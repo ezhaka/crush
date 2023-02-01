@@ -20,7 +20,7 @@ suspend fun ProcessingScope.setUiExtensions() {
 
         setBody("{\"contextIdentifier\":\"global\",\"extensions\":[" +
                 "{\"className\":\"TopLevelPageUiExtensionIn\",\"displayName\":\"Secret Crush\",\"uniqueCode\":\"crush\",\"iframeUrl\": \"http://localhost:3001/\"}," +
-                "{\"className\":\"SidebarHeaderIconExtensionIn\",\"iframeUrl\": \"http://localhost:3001/\"}" +
+                "{\"className\":\"SidebarHeaderIconExtensionIn\",\"iframeUrl\": \"http://localhost:3001/notification.html\"}" +
                 "]}")
     }
 
