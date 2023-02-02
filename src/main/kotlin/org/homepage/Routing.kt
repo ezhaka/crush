@@ -63,6 +63,10 @@ fun Application.configureRouting() {
             call.respond(HttpStatusCode.OK)
         }
 
+        get("/healthz") {
+            call.respond(HttpStatusCode.OK)
+        }
+
         get<Routes.GetChannels> { params ->
             runAuthorized { spaceTokenInfo ->
                 call.respond(HttpStatusCode.OK, GetChannelsService(spaceTokenInfo).getChannels(params.query))
