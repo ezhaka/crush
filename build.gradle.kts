@@ -85,8 +85,14 @@ dockerCompose {
     removeVolumes = false
 }
 
+tasks.register("npmLogout", NpmTask::class) {
+    npmCommand.set(listOf("logout"))
+    workingDir.set(File("./client"))
+}
+
 tasks.register("clientNpmInstall", NpmTask::class) {
-    npmCommand.set(listOf("install", "--registry", "https://registry.npmjs.org"))
+    dependsOn("npmLogout")
+    npmCommand.set(listOf("install"))
     workingDir.set(File("./client"))
 }
 
