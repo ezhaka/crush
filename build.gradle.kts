@@ -22,6 +22,7 @@ plugins {
 jib {
     container {
         mainClass = "io.ktor.server.jetty.EngineMain"
+        ports = listOf("8080")
     }
 }
 
