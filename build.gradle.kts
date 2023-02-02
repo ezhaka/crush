@@ -16,6 +16,13 @@ plugins {
     kotlin("plugin.serialization") version "1.7.0"
     id("docker-compose")
     id("com.github.node-gradle.node") version "3.4.0"
+    id("com.google.cloud.tools.jib") version "3.3.1"
+}
+
+jib {
+    container {
+        mainClass = "io.ktor.server.jetty.EngineMain"
+    }
 }
 
 node {

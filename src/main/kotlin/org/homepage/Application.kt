@@ -12,21 +12,21 @@ import space.jetbrains.api.runtime.ktorClientForSpace
 
 @Suppress("unused")
 fun Application.module() {
-    initDbConnection()
+//    initDbConnection()
 
     configureRouting()
 
-    val url = Space.appInstallUrl(
-        spaceServerUrl = "http://localhost:8000",
-        name = "Fuck It",
-        appEndpoint = "http://localhost:8080/api/space",
-        authFlows = setOf(SpaceAuthFlow.ClientCredentials, SpaceAuthFlow.AuthorizationCode(listOf("https://nowhere.domain"), false)),
-    )
-
-
-    println("Fuck It url $url")
+//    val url = Space.appInstallUrl(
+//        spaceServerUrl = "http://localhost:8000",
+//        name = "Fuck It",
+//        appEndpoint = "http://localhost:8080/api/space",
+//        authFlows = setOf(SpaceAuthFlow.ClientCredentials, SpaceAuthFlow.AuthorizationCode(listOf("https://nowhere.domain"), false)),
+//    )
+//
+//
+//    println("Fuck It url $url")
 }
 
-val spaceHttpClient = ktorClientForSpace()
+val spaceHttpClient by lazy { ktorClientForSpace() }
 
 val config: Config by lazy { ConfigFactory.load() }
