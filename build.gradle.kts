@@ -86,7 +86,7 @@ dockerCompose {
 }
 
 tasks.register("clientNpmInstall", NpmTask::class) {
-    npmCommand.set(listOf("install"))
+    npmCommand.set(listOf("install", "--registry", "https://registry.npmjs.org"))
     workingDir.set(File("./client"))
 }
 
