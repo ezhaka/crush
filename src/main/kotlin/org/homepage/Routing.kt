@@ -23,7 +23,6 @@ import space.jetbrains.api.runtime.Space
 import space.jetbrains.api.runtime.helpers.RequestAdapter
 import space.jetbrains.api.runtime.helpers.SpaceHttpResponse
 import space.jetbrains.api.runtime.helpers.processPayload
-import space.jetbrains.api.runtime.resources.chats
 import space.jetbrains.api.runtime.resources.teamDirectory
 import space.jetbrains.api.runtime.types.InitPayload
 
@@ -49,14 +48,10 @@ fun Application.configureRouting() {
             }
         }
 
-        static("/space-iframe") {
-            staticBasePackage = "space-iframe"
+        static("/") {
+            staticBasePackage = "static"
             resources(".")
             defaultResource("index.html")
-        }
-        static("/") {
-            staticBasePackage = "space-iframe"
-            resources(".")
         }
 
         get("/health") {

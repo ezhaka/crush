@@ -8,7 +8,8 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun initDbConnection() {
-    val postgresUrl = config.tryGetString("storage.postgres.url")?.let { Url(it) }
+    val postgresUrl = System.getenv("DB_URL")?.let { Url(it) }
+        ?: config.tryGetString("storage.postgres.url")?.let { Url(it) }
         ?: throw IllegalArgumentException("storage.postgres.url configuration parameter not set or invalid")
 
     val connection = Database.connect(

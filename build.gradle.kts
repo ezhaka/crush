@@ -74,7 +74,7 @@ kotlin.sourceSets.all {
 sourceSets {
     main {
         resources {
-            srcDirs("build/client")
+            srcDirs("client/dist")
         }
     }
 }
@@ -112,6 +112,14 @@ tasks {
 
 //    run.dependsOn("buildClient")
     val distZip by existing {
+        dependsOn("buildClient")
+    }
+
+    val jib by existing {
+        dependsOn("buildClient")
+    }
+
+    val jibDockerBuild by existing {
         dependsOn("buildClient")
     }
 }

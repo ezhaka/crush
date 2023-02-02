@@ -12,7 +12,7 @@ import space.jetbrains.api.runtime.ktorClientForSpace
 
 @Suppress("unused")
 fun Application.module() {
-//    initDbConnection()
+    initDbConnection()
 
     configureRouting()
 
