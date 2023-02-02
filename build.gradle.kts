@@ -116,13 +116,13 @@ tasks {
         dependsOn("buildClient")
     }
 
-    val jib by existing {
-        dependsOn("buildClient")
-    }
-
-    val jibDockerBuild by existing {
-        dependsOn("buildClient")
-    }
+//    val jib by existing {
+//        dependsOn("buildClient")
+//    }
+//
+//    val jibDockerBuild by existing {
+//        dependsOn("buildClient")
+//    }
 }
 
 application {
