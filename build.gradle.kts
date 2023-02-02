@@ -29,6 +29,7 @@ jib {
 node {
     version.set("16.15.1")
     download.set(true)
+    nodeProjectDir.set(file("${project.projectDir}/client"))
 }
 
 repositories {
@@ -84,23 +85,17 @@ dockerCompose {
     removeContainers = false
     removeVolumes = false
 }
-
-tasks.register("npmLogout", NpmTask::class) {
-    npmCommand.set(listOf("logout"))
-    workingDir.set(File("./client"))
-}
-
-tasks.register("clientNpmInstall", NpmTask::class) {
-    dependsOn("npmLogout")
-    npmCommand.set(listOf("install"))
-    workingDir.set(File("./client"))
-}
+//
+//tasks.register("clientNpmInstall", NpmTask::class) {
+//    dependsOn("npmLogout")
+//    npmCommand.set(listOf("install"))
+//    workingDir.set(File("./client"))
+//}
 
 tasks.register("buildClient", NpmTask::class) {
     npmCommand.set(listOf("run", "build"))
-    workingDir.set(File("./client"))
 
-    dependsOn("clientNpmInstall")
+    dependsOn("npmInstall")
 }
 
 
