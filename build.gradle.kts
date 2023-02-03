@@ -85,12 +85,6 @@ dockerCompose {
     removeContainers = false
     removeVolumes = false
 }
-//
-//tasks.register("clientNpmInstall", NpmTask::class) {
-//    dependsOn("npmLogout")
-//    npmCommand.set(listOf("install"))
-//    workingDir.set(File("./client"))
-//}
 
 tasks.register("buildClient", NpmTask::class) {
     npmCommand.set(listOf("run", "build"))
@@ -111,18 +105,17 @@ tasks {
     val run by getting(JavaExec::class)
     dockerCompose.isRequiredBy(run)
 
-//    run.dependsOn("buildClient")
     val distZip by existing {
         dependsOn("buildClient")
     }
 
-//    val jib by existing {
-//        dependsOn("buildClient")
-//    }
-//
-//    val jibDockerBuild by existing {
-//        dependsOn("buildClient")
-//    }
+    val jib by existing {
+        dependsOn("buildClient")
+    }
+
+    val jibDockerBuild by existing {
+        dependsOn("buildClient")
+    }
 }
 
 application {

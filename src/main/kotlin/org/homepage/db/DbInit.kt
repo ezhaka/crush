@@ -8,30 +8,24 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun initDbConnection() {
-    println("System.getenv()=${System.getenv()}")
-
-    println("DB0_URL = ${System.getenv("DB0_URL")}")
-    println("storage.postgres.url = ${config.tryGetString("storage.postgres.url")}")
-
-    val postgresUrl = System.getenv("DB0_URL")?.let { Url(it) }
-        ?: config.tryGetString("storage.postgres.url")?.let { Url(it) }
+    val postgresUrl = config.tryGetString("storage.postgres.url")?.let { Url(it) }
         ?: throw IllegalArgumentException("storage.postgres.url configuration parameter not set or invalid")
 
     println("postgresUrl = $postgresUrl")
-//
-//    val connection = Database.connect(
-//        url = URLBuilder(postgresUrl).apply {
-//            protocol = URLProtocol("jdbc:postgresql", 5432)
-//            port = postgresUrl.port
-//            user = null
-//            password = null
-//        }.buildString(),
-//        driver = "org.postgresql.Driver",
-//        user = postgresUrl.user!!,
-//        password = postgresUrl.password!!
-//    )
-//
-//    transaction(connection) {
-//        SchemaUtils.createMissingTablesAndColumns(AppInstallation, IncomingValentine)
-//    }
+
+    val connection = Database.connect(
+        url = URLBuilder(postgresUrl).apply {
+            protocol = URLProtocol("jdbc:postgresql", 5432)
+            port = postgresUrl.port
+            user = null
+            password = null
+        }.buildString(),
+        driver = "org.postgresql.Driver",
+        user = postgresUrl.user!!,
+        password = postgresUrl.password!!
+    )
+
+    transaction(connection) {
+        SchemaUtils.createMissingTablesAndColumns(AppInstallation, IncomingValentine)
+    }
 }
