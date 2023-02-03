@@ -2,7 +2,6 @@ package org.homepage
 
 import AppHasPermissionsService
 import Routes
-import SendMessageService
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -15,6 +14,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.homepage.db.IncomingValentine
 import org.homepage.services.*
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -23,7 +23,10 @@ import space.jetbrains.api.runtime.Space
 import space.jetbrains.api.runtime.helpers.RequestAdapter
 import space.jetbrains.api.runtime.helpers.SpaceHttpResponse
 import space.jetbrains.api.runtime.helpers.processPayload
+import space.jetbrains.api.runtime.resources.applications
 import space.jetbrains.api.runtime.resources.teamDirectory
+import space.jetbrains.api.runtime.types.ApplicationIdentifier
+import space.jetbrains.api.runtime.types.GlobalPermissionContextIdentifier
 import space.jetbrains.api.runtime.types.InitPayload
 
 fun Application.configureRouting() {
@@ -37,9 +40,16 @@ fun Application.configureRouting() {
             Space.processPayload(ktorRequestAdapter(call), spaceHttpClient, AppInstanceStorage) { payload ->
                 when (payload) {
                     is InitPayload -> {
+                        clientWithClientCredentials().applications.authorizations.authorizedRights.requestRights(
+                            application = ApplicationIdentifier.Me,
+                            contextIdentifier = GlobalPermissionContextIdentifier,
+                            rightCodes = listOf("Profile.View")
+                        )
+
                         setUiExtensions()
                         SpaceHttpResponse.RespondWithOk
                     }
+
                     else -> {
                         call.respond(HttpStatusCode.OK)
                         SpaceHttpResponse.RespondWithOk
@@ -62,12 +72,6 @@ fun Application.configureRouting() {
             call.respond(HttpStatusCode.OK)
         }
 
-        get<Routes.GetChannels> { params ->
-            runAuthorized { spaceTokenInfo ->
-                call.respond(HttpStatusCode.OK, GetChannelsService(spaceTokenInfo).getChannels(params.query))
-            }
-        }
-
         get<Routes.GetProfiles> { params ->
             runAuthorized { spaceTokenInfo ->
                 val profiles = spaceTokenInfo.appSpaceClient().teamDirectory.profiles.getAllProfiles(
@@ -80,13 +84,6 @@ fun Application.configureRouting() {
             }
         }
 
-        post<Routes.SendMessage> { params ->
-            runAuthorized { spaceTokenInfo ->
-                SendMessageService(spaceTokenInfo).sendMessage(params.channelId, params.messageText)
-                call.respond(HttpStatusCode.OK)
-            }
-        }
-
         post<Routes.SendValentine> { params ->
             runAuthorized { spaceTokenInfo ->
                 // TODO
@@ -94,6 +91,7 @@ fun Application.configureRouting() {
 
                 transaction {
                     IncomingValentine.insert {
+                        it[this.clientId] = spaceTokenInfo.spaceAppInstance.clientId
                         it[this.receiver] = params.receiverId
                         it[this.message] = params.messageText
                     }
@@ -111,8 +109,9 @@ fun Application.configureRouting() {
                 val valentines = transaction {
                     IncomingValentine
                         .select {
-                        IncomingValentine.receiver eq spaceTokenInfo.spaceUserId
-                    }
+                            (IncomingValentine.clientId eq spaceTokenInfo.spaceAppInstance.clientId) and
+                                (IncomingValentine.receiver eq spaceTokenInfo.spaceUserId)
+                        }
                         .map { IncomingValentine(it[IncomingValentine.id].value, it[IncomingValentine.message]) }
                 }
 

@@ -7,7 +7,6 @@ import org.homepage.db.initDbConnection
 import space.jetbrains.api.runtime.Space
 import space.jetbrains.api.runtime.SpaceAuthFlow
 import space.jetbrains.api.runtime.appInstallUrl
-import space.jetbrains.api.runtime.helpers.processPayload
 import space.jetbrains.api.runtime.ktorClientForSpace
 
 @Suppress("unused")
@@ -16,15 +15,31 @@ fun Application.module() {
 
     configureRouting()
 
-//    val url = Space.appInstallUrl(
-//        spaceServerUrl = "http://localhost:8000",
-//        name = "Fuck It",
-//        appEndpoint = "http://localhost:8080/api/space",
-//        authFlows = setOf(SpaceAuthFlow.ClientCredentials, SpaceAuthFlow.AuthorizationCode(listOf("https://nowhere.domain"), false)),
-//    )
-//
-//
-//    println("Fuck It url $url")
+    println(
+        "Public install url ${
+            Space.appInstallUrl(
+                spaceServerUrl = "https://spacerschoice.jetbrains.space/",
+                name = "Secret Crush",
+                appEndpoint = "https://secret-crush-test.labs.jb.gg/api/space",
+                authFlows = setOf(
+                    SpaceAuthFlow.ClientCredentials,
+                    SpaceAuthFlow.AuthorizationCode(listOf("https://nowhere.domain"), false)
+                ),
+            )
+        }")
+
+    println(
+        "Internal install url ${
+            Space.appInstallUrl(
+                spaceServerUrl = "http://localhost:8000/",
+                name = "Secret Crush",
+                appEndpoint = "http://localhost:8080/api/space",
+                authFlows = setOf(
+                    SpaceAuthFlow.ClientCredentials,
+                    SpaceAuthFlow.AuthorizationCode(listOf("https://nowhere.domain"), false)
+                ),
+            )
+        }")
 }
 
 val spaceHttpClient by lazy { ktorClientForSpace() }
