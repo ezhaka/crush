@@ -4,6 +4,8 @@ import {approvePermissionRequest, fetchSpaceUserToken, UserTokenData} from "../U
 import {SendValentineForm} from './SendValentineForm';
 import {httpGet} from "../api/http";
 import {ValentineView} from "./ValentineView";
+import "./App.css"
+import {Button} from "./Button";
 
 interface RootPage {
     kind: "root";
@@ -61,20 +63,34 @@ function App() {
     return (
         <>
             <PageContext.Provider value={setPage}>
-                <button onClick={onClick}>BACK</button>
+                <div className="page">
+                    {/*<button onClick={onClick}>BACK</button>*/}
 
-                {page.kind == "root" && <div>
-                    {valentines?.map(v => <div key={v.id} onClick={() => {
-                        setPage({kind: "valentine", valentine: v})
-                    }}>❤️</div>)}
+                    <div className="logo"></div>
+                    <div className="promo-header">Make this Valentine's Day very special!</div>
+                    <div className="promo-text">Our secure and confidential service ensures that your feelings will
+                        reach your crush without revealing your identity. Choose from our selection of beautiful
+                        valentines and add a secret message if you wish.
+                    </div>
 
-                    <button onClick={() => setPage({kind: "sendForm"})}>SEND</button>
+                    <Button title="Send secret valentine" action={() => {
+                        setPage({kind: "sendForm"})
+                    }}/>
 
-                </div>}
 
-                {page.kind == "sendForm" && token && <SendValentineForm token={token}/>}
+                    {page.kind == "root" && <div>
+                        {valentines?.map(v => <div key={v.id} onClick={() => {
+                            setPage({kind: "valentine", valentine: v})
+                        }}>❤️</div>)}
 
-                {page.kind == "valentine" && <ValentineView valentine={page.valentine}/>}
+                        {/*<button onClick={() => setPage({kind: "sendForm"})}>SEND</button>*/}
+
+                    </div>}
+
+                    {page.kind == "sendForm" && token && <SendValentineForm token={token}/>}
+
+                    {page.kind == "valentine" && <ValentineView valentine={page.valentine}/>}
+                </div>
             </PageContext.Provider>
         </>
     );

@@ -1,0 +1,59 @@
+.button {
+    background-image: url('./../../resources/buttonBackground.svg');
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    display: flex;
+    padding: 10px 24px 16px 24px;
+    font-family: "Bangers", sans-serif;
+    font-weight: 400;
+    font-size: 62px;
+    line-height: 66px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.button-label {
+    position: relative;
+    text-align: center;
+}
+
+.button-label-label-text {
+    position: relative;
+    color: white;
+}
+
+.button-label-label-text-1 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    color: #FF1418;
+    top: 3px;
+    left: -2px;
+}
+
+.button:hover .button-label-label-text-1 {
+    color: #FF14CB;
+    top: 4px;
+    left: -2px;
+}
+
+.button-label-label-text-2 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    color: #1AECFD;
+    top: -3px;
+    left: 1px;
+}
+
+.button:hover .button-label-label-text-2 {
+    color: #1A75FD;
+    top: -4px;
+    left: 3px;
+}
+
+.button-label-transition {
+    transition: top ease 250ms;
+    transition: left ease 250ms;
+    transition: color ease 250ms;
+}

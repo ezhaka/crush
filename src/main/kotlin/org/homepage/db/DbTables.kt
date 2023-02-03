@@ -20,6 +20,7 @@ object IncomingValentine : LongIdTable("incoming_valentine2") {
     val read = bool("read").default(false)
 
     init {
+        // TODO: shouldn't be here
         uniqueIndex(clientId, receiver)
     }
 }
