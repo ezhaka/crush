@@ -4,6 +4,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.*
+import io.ktor.server.config.*
 import kotlinx.serialization.Serializable
 import space.jetbrains.api.runtime.helpers.ProcessingScope
 import space.jetbrains.api.runtime.resources.applications
@@ -18,9 +19,11 @@ suspend fun ProcessingScope.setUiExtensions() {
         contentType(ContentType.Application.Json)
         bearerAuth(client.token().accessToken)
 
+        val publicUrl = config.tryGetString("crush.publicUrl")?.trimEnd('/') ?: "http://localhost:3001"
+
         setBody("{\"contextIdentifier\":\"global\",\"extensions\":[" +
-                "{\"className\":\"TopLevelPageUiExtensionIn\",\"displayName\":\"Secret Crush\",\"uniqueCode\":\"crush\",\"iframeUrl\": \"http://localhost:3001/\"}," +
-                "{\"className\":\"SidebarHeaderIconExtensionIn\",\"iframeUrl\": \"http://localhost:3001/notification.html\"}" +
+                "{\"className\":\"TopLevelPageUiExtensionIn\",\"displayName\":\"Secret Crush\",\"uniqueCode\":\"crush\",\"iframeUrl\": \"$publicUrl:3001/\"}," +
+//                "{\"className\":\"SidebarHeaderIconExtensionIn\",\"iframeUrl\": \"$publicUrl/notification.html\"}" +
                 "]}")
     }
 
