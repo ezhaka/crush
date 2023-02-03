@@ -4,8 +4,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     mode: 'development',
     entry: {
-        app: './src/app/main.tsx',
-        notification: './src/notification/main.tsx',
+        app: './src/app/Main.tsx',
+        notification: './src/notification/Main.tsx',
     },
     devtool: 'inline-source-map',
     output: {
