@@ -17,3 +17,15 @@ export const Button = ({title, action}: Props) => {
         </div>
     )
 }
+
+type ButtonTitleProps = {
+    title: string
+}
+
+export const ButtonTitle = ({title}: ButtonTitleProps) => (
+    <div className="button-label">
+        <div className="button-label-label-text-2 button-label-transition">{title}</div>
+        <div className="button-label-label-text-1 button-label-transition">{title}</div>
+        <div className="button-label-label-text">{title}</div>
+    </div>
+)

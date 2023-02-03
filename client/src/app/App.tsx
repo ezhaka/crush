@@ -1,11 +1,11 @@
 import * as React from 'react';
 import {createContext, useCallback, useEffect, useState} from "react";
-import {approvePermissionRequest, fetchSpaceUserToken, UserTokenData} from "../UserTokenData";
+import {fetchSpaceUserToken, UserTokenData} from "../UserTokenData";
 import {SendValentineForm} from './SendValentineForm';
 import {httpGet} from "../api/http";
 import {ValentineView} from "./ValentineView";
 import "./App.css"
-import {Button} from "./Button";
+import { RootPage } from './RootPage';
 
 interface RootPage {
     kind: "root";
@@ -64,31 +64,8 @@ function App() {
         <>
             <PageContext.Provider value={setPage}>
                 <div className="page">
-                    {/*<button onClick={onClick}>BACK</button>*/}
-
-                    <div className="logo"></div>
-                    <div className="promo-header">Make this Valentine's Day very special!</div>
-                    <div className="promo-text">Our secure and confidential service ensures that your feelings will
-                        reach your crush without revealing your identity. Choose from our selection of beautiful
-                        valentines and add a secret message if you wish.
-                    </div>
-
-                    <Button title="Send secret valentine" action={() => {
-                        setPage({kind: "sendForm"})
-                    }}/>
-
-
-                    {page.kind == "root" && <div>
-                        {valentines?.map(v => <div key={v.id} onClick={() => {
-                            setPage({kind: "valentine", valentine: v})
-                        }}>❤️</div>)}
-
-                        {/*<button onClick={() => setPage({kind: "sendForm"})}>SEND</button>*/}
-
-                    </div>}
-
+                    {page.kind == "root" && <RootPage />}
                     {page.kind == "sendForm" && token && <SendValentineForm token={token}/>}
-
                     {page.kind == "valentine" && <ValentineView valentine={page.valentine}/>}
                 </div>
             </PageContext.Provider>

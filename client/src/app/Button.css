@@ -4,10 +4,7 @@
     background-repeat: no-repeat;
     display: flex;
     padding: 10px 24px 16px 24px;
-    font-family: "Bangers", sans-serif;
-    font-weight: 400;
-    font-size: 62px;
-    line-height: 66px;
+
     cursor: pointer;
     user-select: none;
 }
@@ -15,6 +12,10 @@
 .button-label {
     position: relative;
     text-align: center;
+    font-family: "Bangers", sans-serif;
+    font-weight: 400;
+    font-size: 62px;
+    line-height: 66px;
 }
 
 .button-label-label-text {
