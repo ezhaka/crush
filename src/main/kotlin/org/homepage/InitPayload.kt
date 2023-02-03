@@ -22,8 +22,8 @@ suspend fun ProcessingScope.setUiExtensions() {
         val publicUrl = config.tryGetString("crush.publicUrl")?.trimEnd('/') ?: "http://localhost:3001"
 
         setBody("{\"contextIdentifier\":\"global\",\"extensions\":[" +
-                "{\"className\":\"TopLevelPageUiExtensionIn\",\"displayName\":\"Secret Crush\",\"uniqueCode\":\"crush\",\"iframeUrl\": \"$publicUrl:3001/\"}," +
-//                "{\"className\":\"SidebarHeaderIconExtensionIn\",\"iframeUrl\": \"$publicUrl/notification.html\"}" +
+                "{\"className\":\"TopLevelPageUiExtensionIn\",\"displayName\":\"Secret Crush\",\"uniqueCode\":\"crush\",\"iframeUrl\": \"$publicUrl/\"}" +
+//                ",{\"className\":\"SidebarHeaderIconExtensionIn\",\"iframeUrl\": \"$publicUrl/notification.html\"}" +
                 "]}")
     }
 
