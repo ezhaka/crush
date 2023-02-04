@@ -86,9 +86,6 @@ fun Application.configureRouting() {
 
         post<Routes.SendValentine> { params ->
             runAuthorized { spaceTokenInfo ->
-                // TODO
-                println("SendValentine spaceUserId = ${spaceTokenInfo.spaceUserId}")
-
                 transaction {
                     IncomingValentine.insert {
                         it[this.clientId] = spaceTokenInfo.spaceAppInstance.clientId
@@ -103,9 +100,6 @@ fun Application.configureRouting() {
 
         get<Routes.GetIncomingValentines> { params ->
             runAuthorized { spaceTokenInfo ->
-                // TODO
-                println("GetIncomingValentines spaceUserId = ${spaceTokenInfo.spaceUserId}")
-
                 val valentines = transaction {
                     IncomingValentine
                         .select {

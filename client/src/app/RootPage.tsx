@@ -15,6 +15,13 @@ export const RootPage = () => {
             {/*    setPage({kind: "valentine", valentine: v})*/}
             {/*}}>❤️</div>)}*/}
 
+            <a href="#" onClick={() => {
+                const channel = new MessageChannel();
+                window.parent.postMessage({
+                    type: "LeaveFullScreenRequest",
+                }, "*", [channel.port2]);
+            }} className="back-to-space">Back To Space</a>
+
             <div className="logo"></div>
             <div className="promo-header">Make this Valentine's Day very special!</div>
             <div className="promo-text">Our secure and confidential service ensures that your feelings will

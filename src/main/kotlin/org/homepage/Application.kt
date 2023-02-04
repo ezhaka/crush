@@ -33,7 +33,7 @@ fun Application.module() {
             Space.appInstallUrl(
                 spaceServerUrl = "http://localhost:8000/",
                 name = "Secret Crush",
-                appEndpoint = "http://localhost:8080/api/space",
+                appEndpoint = "http://localhost:3001/api/space",
                 authFlows = setOf(
                     SpaceAuthFlow.ClientCredentials,
                     SpaceAuthFlow.AuthorizationCode(listOf("https://nowhere.domain"), false)

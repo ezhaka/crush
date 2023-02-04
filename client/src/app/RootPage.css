@@ -11,6 +11,24 @@
     align-items: center;
 }
 
+.back-to-space {
+    position: absolute;
+    top: 40px;
+    left: 60px;
+    color: white;
+    text-decoration: none;
+}
+
+.back-to-space:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.back-to-space:active {
+    color: white;
+    text-decoration: none;
+}
+
 .logo {
     width: 305px;
     height: 255px;
