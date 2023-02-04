@@ -39,13 +39,13 @@ module.exports = {
                 exclude: /node_modules/,
             },
             {
-                test: /\.svg$/,
-                loader: 'svg-inline-loader'
+                test: /\.png/,
+                type: 'asset/resource'
             }
         ]
     },
     resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
+        extensions: ['.tsx', '.ts', '.js', '.png'],
     },
     plugins:[
         new HtmlWebpackPlugin({

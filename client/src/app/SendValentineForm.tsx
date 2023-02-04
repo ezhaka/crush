@@ -6,6 +6,8 @@ import "./SendValentineForm.css";
 import {PageContext} from "./App";
 import {ProfileSelectItem, ProfileSelector} from "./ProfileSelector";
 import {Button} from "./Button";
+import {valentineTypes} from "./ValentineType";
+import {ValentineEditor} from "./ValentineEditor";
 
 type Props = {
     token: UserTokenData;
@@ -25,12 +27,19 @@ export const SendValentineForm = ({token}: Props) => {
     return (
         <>
             <div className="send-valentine-form">
+                <a href="#"
+                   className="close-link"
+                   onClick={(e) => {
+                       e.preventDefault()
+                       setPage({kind: "root"})
+                   }}>
+                </a>
+
                 <ProfileSelector value={profile} onChange={setProfile} token={token}/>
 
-                <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={5}/>
+                <ValentineEditor message={message} setMessage={setMessage} type={valentineTypes[0]} />
 
                 <Button title="SEND IT!" action={submit}/>
-                <button onClick={() => setPage({kind: "root"})}>X</button>
             </div>
         </>
     )

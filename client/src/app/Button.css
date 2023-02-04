@@ -1,6 +1,6 @@
 .button {
     background-image: url('./../../resources/buttonBackground.svg');
-    background-size: 100% auto;
+    background-size: cover;
     background-repeat: no-repeat;
     display: flex;
     padding: 10px 24px 16px 24px;

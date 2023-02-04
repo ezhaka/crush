@@ -1,0 +1,18 @@
+.valentine-editor {
+    position: relative;
+}
+
+.valentine-editor textarea {
+    position: absolute;
+    border: none;
+    background-color: transparent;
+    resize: none;
+    outline: none;
+    font-family: "Unbounded", sans-serif;
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 400;
+
+    /* todo: not always */
+    color: white;
+}

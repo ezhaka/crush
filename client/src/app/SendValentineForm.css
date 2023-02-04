@@ -7,3 +7,12 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.8);
 }
+
+.close-link {
+    background: url(./../../resources/cross.svg);
+    width: 37px;
+    height: 38px;
+    position: absolute;
+    top: 72px;
+    right: 72px;
+}
