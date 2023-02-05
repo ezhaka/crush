@@ -12,12 +12,13 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.homepage.db.IncomingValentine
+import org.homepage.db.IncomingValentineTable
 import org.homepage.services.*
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.LoggerFactory
 import space.jetbrains.api.runtime.BatchInfo
 import space.jetbrains.api.runtime.Space
 import space.jetbrains.api.runtime.helpers.RequestAdapter
@@ -30,6 +31,8 @@ import space.jetbrains.api.runtime.types.GlobalPermissionContextIdentifier
 import space.jetbrains.api.runtime.types.InitPayload
 
 fun Application.configureRouting() {
+    val log = LoggerFactory.getLogger("Routing.kt")
+
     install(Locations)
     install(ContentNegotiation) {
         json()
@@ -86,12 +89,19 @@ fun Application.configureRouting() {
 
         post<Routes.SendValentine> { params ->
             runAuthorized { spaceTokenInfo ->
-                transaction {
-                    IncomingValentine.insert {
-                        it[this.clientId] = spaceTokenInfo.spaceAppInstance.clientId
+                val spaceAppInstance = spaceTokenInfo.spaceAppInstance
+                val row = transaction {
+                    IncomingValentineTable.insert {
+                        it[this.serverUrl] = spaceAppInstance.spaceServer.serverUrl
                         it[this.receiver] = params.receiverId
                         it[this.message] = params.messageText
-                    }
+                    }.resultedValues!!.first()
+                }
+
+                val eventSendResult = eventChannel.trySend(ModificationEvent(spaceAppInstance, row[IncomingValentineTable.id].value, params.receiverId))
+
+                if (!eventSendResult.isSuccess) {
+                    log.error("Unable to send modification event, probably the corresponding channel is full")
                 }
 
                 call.respond(HttpStatusCode.OK)
@@ -101,12 +111,12 @@ fun Application.configureRouting() {
         get<Routes.GetIncomingValentines> { params ->
             runAuthorized { spaceTokenInfo ->
                 val valentines = transaction {
-                    IncomingValentine
+                    IncomingValentineTable
                         .select {
-                            (IncomingValentine.clientId eq spaceTokenInfo.spaceAppInstance.clientId) and
-                                (IncomingValentine.receiver eq spaceTokenInfo.spaceUserId)
+                            (IncomingValentineTable.serverUrl eq spaceTokenInfo.spaceAppInstance.spaceServer.serverUrl) and
+                                (IncomingValentineTable.receiver eq spaceTokenInfo.spaceUserId)
                         }
-                        .map { IncomingValentine(it[IncomingValentine.id].value, it[IncomingValentine.message]) }
+                        .map { IncomingValentine(it[IncomingValentineTable.id].value, it[IncomingValentineTable.message]) }
                 }
 
                 call.respond(HttpStatusCode.OK, IncomingValentineListResponse(valentines))

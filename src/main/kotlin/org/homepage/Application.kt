@@ -15,6 +15,8 @@ fun Application.module() {
 
     configureRouting()
 
+    processEvents()
+
     println(
         "Public install url ${
             Space.appInstallUrl(
