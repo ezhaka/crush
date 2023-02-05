@@ -1,0 +1,17 @@
+.valentine-view-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%;
+}
+
+.valentine-view {
+    position: relative;
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 400;
+}
+
+.valentine-message {
+    position: absolute;
+}

@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 class IncomingValentine(
     val id: Long,
     val message: String,
+    val type: Int
 )
 
 @Serializable

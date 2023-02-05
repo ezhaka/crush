@@ -7,6 +7,9 @@ object Routes {
     @Location("/homepage/send-valentine")
     class SendValentine(val receiverId: String, val messageText: String)
 
+    @Location("/homepage/read-valentine")
+    class ReadValentine(val valentineId: Long)
+
     @Location("/homepage/get-incoming-valentines")
     object GetIncomingValentines
 

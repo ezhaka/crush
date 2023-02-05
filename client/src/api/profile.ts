@@ -11,4 +11,5 @@ interface ProfileListResponse {
 interface Valentine {
     id: number;
     message: string;
+    type: number;
 }

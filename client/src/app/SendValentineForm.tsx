@@ -1,7 +1,7 @@
 import * as React from "react";
-import {UserTokenData} from "../UserTokenData";
 import {useContext, useState} from "react";
-import {httpGet, httpPost} from "../api/http";
+import {UserTokenData} from "../UserTokenData";
+import {httpPost} from "../api/http";
 import "./SendValentineForm.css";
 import {PageContext} from "./App";
 import {ProfileSelectItem, ProfileSelector} from "./ProfileSelector";
@@ -16,7 +16,6 @@ type Props = {
 export const SendValentineForm = ({token}: Props) => {
     const [profile, setProfile] = useState<ProfileSelectItem>()
     const [message, setMessage] = useState<string>()
-    const setPage = useContext(PageContext)
 
     const submit = () => {
         // TODO: all to body!
@@ -27,13 +26,6 @@ export const SendValentineForm = ({token}: Props) => {
     return (
         <>
             <div className="send-valentine-form">
-                <a href="#"
-                   className="close-link"
-                   onClick={(e) => {
-                       e.preventDefault()
-                       setPage({kind: "root"})
-                   }}>
-                </a>
 
                 <ProfileSelector value={profile} onChange={setProfile} token={token}/>
 
@@ -44,3 +36,4 @@ export const SendValentineForm = ({token}: Props) => {
         </>
     )
 }
+

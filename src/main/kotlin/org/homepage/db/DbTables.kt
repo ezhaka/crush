@@ -14,9 +14,11 @@ object AppInstallationTable : Table("app_installation") {
 object IncomingValentineTable : LongIdTable("incoming_valentine3") {
     val serverUrl = varchar("server_url", 256)
     val receiver = varchar("receiver_id", 64)
+    val type = integer("type").default(0)
     val message = varchar("message", 1024)
     val read = bool("read").default(false)
-    val counterUpdated = bool("counterUpdated").default(false)
+    val incomingCounterUpdated = bool("counterUpdated").default(false)
+    val readCounterUpdated = bool("readCounterUpdated").nullable()
 
     init {
         index(isUnique = false, serverUrl, receiver)

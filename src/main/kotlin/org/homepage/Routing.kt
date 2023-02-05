@@ -8,15 +8,14 @@ import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.locations.*
 import io.ktor.server.locations.post
+import io.ktor.server.locations.put
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.homepage.db.IncomingValentineTable
 import org.homepage.services.*
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 import space.jetbrains.api.runtime.BatchInfo
@@ -98,11 +97,7 @@ fun Application.configureRouting() {
                     }.resultedValues!!.first()
                 }
 
-                val eventSendResult = eventChannel.trySend(ModificationEvent(spaceAppInstance, row[IncomingValentineTable.id].value, params.receiverId))
-
-                if (!eventSendResult.isSuccess) {
-                    log.error("Unable to send modification event, probably the corresponding channel is full")
-                }
+                sendModificationEvent(spaceAppInstance, row[IncomingValentineTable.id].value, params.receiverId)
 
                 call.respond(HttpStatusCode.OK)
             }
@@ -112,14 +107,39 @@ fun Application.configureRouting() {
             runAuthorized { spaceTokenInfo ->
                 val valentines = transaction {
                     IncomingValentineTable
-                        .select {
-                            (IncomingValentineTable.serverUrl eq spaceTokenInfo.spaceAppInstance.spaceServer.serverUrl) and
-                                (IncomingValentineTable.receiver eq spaceTokenInfo.spaceUserId)
+                        .select { matchUser(spaceTokenInfo) }
+                        .map {
+                            IncomingValentine(
+                                it[IncomingValentineTable.id].value,
+                                it[IncomingValentineTable.message],
+                                it[IncomingValentineTable.type]
+                            )
                         }
-                        .map { IncomingValentine(it[IncomingValentineTable.id].value, it[IncomingValentineTable.message]) }
                 }
 
                 call.respond(HttpStatusCode.OK, IncomingValentineListResponse(valentines))
+            }
+        }
+
+        put<Routes.ReadValentine> { params ->
+            runAuthorized { spaceTokenInfo ->
+                val spaceAppInstance = spaceTokenInfo.spaceAppInstance
+
+                val rowsUpdated = transaction {
+                    IncomingValentineTable.update(where = {
+                        matchUser(spaceTokenInfo) and (IncomingValentineTable.id eq params.valentineId)
+                    }) {
+                        it[read] = true
+                        it[readCounterUpdated] = false
+                    }
+                }
+
+                if (rowsUpdated == 1) {
+                    sendModificationEvent(spaceAppInstance, params.valentineId, spaceTokenInfo.spaceUserId)
+                    call.respond(HttpStatusCode.OK)
+                } else {
+                    call.respond(HttpStatusCode.NotFound)
+                }
             }
         }
 
@@ -130,6 +150,10 @@ fun Application.configureRouting() {
         }
     }
 }
+
+private fun SqlExpressionBuilder.matchUser(spaceTokenInfo: SpaceTokenInfo) =
+    (IncomingValentineTable.serverUrl eq spaceTokenInfo.spaceAppInstance.spaceServer.serverUrl) and
+            (IncomingValentineTable.receiver eq spaceTokenInfo.spaceUserId)
 
 private fun ktorRequestAdapter(call: ApplicationCall): RequestAdapter {
     return object : RequestAdapter {

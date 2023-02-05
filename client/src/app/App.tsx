@@ -3,7 +3,7 @@ import {createContext, useCallback, useEffect, useState} from "react";
 import {fetchSpaceUserToken, UserTokenData} from "../UserTokenData";
 import {SendValentineForm} from './SendValentineForm';
 import {httpGet} from "../api/http";
-import {ValentineView} from "./ValentineView";
+import {ValentineViewPage} from "./ValentineViewPage";
 import "./App.css"
 import { RootPage } from './RootPage';
 
@@ -64,9 +64,9 @@ function App() {
         <>
             <PageContext.Provider value={setPage}>
                 <div className="page">
-                    {page.kind == "root" && <RootPage />}
+                    {page.kind == "root" && <RootPage valentines={valentines} />}
                     {page.kind == "sendForm" && token && <SendValentineForm token={token}/>}
-                    {page.kind == "valentine" && <ValentineView valentine={page.valentine}/>}
+                    {page.kind == "valentine" && <ValentineViewPage valentine={page.valentine} token={token}/>}
                 </div>
             </PageContext.Provider>
         </>

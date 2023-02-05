@@ -7,6 +7,10 @@ export async function httpPost(path: string, token: string, body: object) {
     return await httpRequest('POST', token, path, body);
 }
 
+export async function httpPut(path: string, token: string, body: object) {
+    return await httpRequest('PUT', token, path, body);
+}
+
 async function httpRequest(method: string, token: string, path: string, body?: object) {
     let requestBody = undefined;
     let requestHeaders: HeadersInit = {Authorization: `Bearer ${token}`}

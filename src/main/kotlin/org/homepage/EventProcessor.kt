@@ -8,7 +8,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.homepage.db.IncomingValentineTable
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNotNull
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import space.jetbrains.api.runtime.SpaceAppInstance
 import space.jetbrains.api.runtime.SpaceAuth
@@ -23,6 +26,18 @@ class ModificationEvent(val spaceServerInstance: SpaceAppInstance, val id: Long,
 }
 
 val eventChannel = Channel<ModificationEvent>(capacity = 1024)
+
+fun sendModificationEvent(
+    spaceAppInstance: SpaceAppInstance,
+    id: Long,
+    receiverId: String,
+) {
+    val eventSendResult = eventChannel.trySend(ModificationEvent(spaceAppInstance, id, receiverId))
+
+    if (!eventSendResult.isSuccess) {
+        log.error("Unable to send modification event, probably the corresponding channel is full")
+    }
+}
 
 fun processEvents() {
     // TODO: process stale profiles
@@ -48,17 +63,24 @@ fun processEvents() {
 
                 val client = SpaceClient(spaceHttpClient, event.spaceServerInstance, SpaceAuth.ClientCredentials())
 
+                val body =
+                    "{\"counters\":[{\"profileId\":\"${event.receiverId}\",\"unreadCount\":${unreadCount},\"totalCount\":${totalCount}}]}"
+                log.info("Going to update counters with the following body: $body")
+
                 client.ktorClient.put("${client.server.apiBaseUrl}/internal-heart/update-counters") {
                     this.expectSuccess = true
 
                     contentType(ContentType.Application.Json)
                     bearerAuth(client.token().accessToken)
-                    setBody("{\"counters\":[{\"profileId\":\"${event.receiverId}\",\"unreadCount\":${unreadCount},\"totalCount\":${totalCount}}]}")
+                    setBody(body)
                 }
 
                 transaction {
                     IncomingValentineTable.update(where = { IncomingValentineTable.id eq event.id }) {
-                        it[counterUpdated] = true
+                        it[incomingCounterUpdated] = true
+                        it[readCounterUpdated] = Case(null)
+                            .When(EqOp(readCounterUpdated, booleanLiteral(false)), booleanLiteral(true))
+                            .Else(Op.nullOp())
                     }
                 }
             } catch (e: Exception) {
