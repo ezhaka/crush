@@ -8,6 +8,7 @@ import {ProfileSelectItem, ProfileSelector} from "./ProfileSelector";
 import {Button} from "./Button";
 import {valentineTypes} from "./ValentineType";
 import {ValentineEditor} from "./ValentineEditor";
+import {CloseableOverlay} from "./CloseableOverlay";
 
 type Props = {
     token: UserTokenData;
@@ -24,7 +25,7 @@ export const SendValentineForm = ({token}: Props) => {
     }
 
     return (
-        <>
+        <CloseableOverlay>
             <div className="send-valentine-form">
 
                 <ProfileSelector value={profile} onChange={setProfile} token={token}/>
@@ -33,7 +34,7 @@ export const SendValentineForm = ({token}: Props) => {
 
                 <Button title="SEND IT!" action={submit}/>
             </div>
-        </>
+        </CloseableOverlay>
     )
 }
 

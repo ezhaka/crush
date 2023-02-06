@@ -1,11 +1,34 @@
 .root-page, .root-page_two-column {
     min-height: 100%;
     padding: 16px 0;
-    background-image: url('./../../resources/bg.png');
-    background-position: top center;
-    background-repeat: no-repeat;
+    background: url('./../../resources/background.svg') no-repeat top center, linear-gradient(120.21deg, #F283DA 1.69%, #FFD2E0 100%, #F94D80 100%);
     background-size: cover;
     mix-blend-mode: soft-light;
+}
+
+.noise {
+    background: url('./../../resources/noise.png');
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    mix-blend-mode: soft-light;
+    opacity: 0.5;
+}
+
+.left-column-background {
+    position: absolute;
+    background: #DD456E;
+    opacity: 0.6;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+}
+
+.root-page-content {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -46,18 +69,26 @@
     flex-direction: row;
     max-width: 1450px;
     width: 100%;
+    justify-content: center;
 }
 
-.incoming-valentines-column, .send-valentine-column {
+.send-valentine-column {
+    width: 100%;
+    max-width: 720px;
+    align-items: center;
+}
+
+.incoming-valentines-column,
+.send-valentine-column {
     display: flex;
     flex-direction: column;
     flex-grow: 0;
     flex-shrink: 0;
-    width: 50%;
 }
 
-.send-valentine-column {
-    align-items: center;
+.root-page_two-column .incoming-valentines-column,
+.root-page_two-column .send-valentine-column {
+    width: 50%;
 }
 
 .promo-header {

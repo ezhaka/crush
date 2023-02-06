@@ -9,7 +9,7 @@ type Props = {
     valentines: Valentine[]
 }
 
-const IncomingValentine = ({valentine}: {valentine: Valentine}) => {
+const IncomingValentine = ({valentine}: { valentine: Valentine }) => {
     const valentineType = valentineTypes[valentine.type]
     const src = require(`./../../resources/valentines/${valentineType.name}-small.png`)
     const setPage = useContext(PageContext)
@@ -25,9 +25,9 @@ const IncomingValentine = ({valentine}: {valentine: Valentine}) => {
     </a>)
 }
 
-const IncomingValentineRow = ({valentines}: {valentines: Valentine[]}) => {
+const IncomingValentineRow = ({valentines}: { valentines: Valentine[] }) => {
     return (<div className="incoming-valentines-row">
-        {valentines.map(v => <IncomingValentine valentine={v} />)}
+        {valentines.map(v => <IncomingValentine valentine={v}/>)}
     </div>)
 }
 
@@ -36,36 +36,41 @@ export const RootPage = ({valentines}: Props) => {
 
     const rows = useMemo(() => spreadToRows(valentines), [valentines])
 
-    const twoColumn = !!valentines
+    const twoColumn = valentines && valentines.length > 0
 
     return (
         <div className={twoColumn ? "root-page_two-column" : "root-page"}>
-            <a href="#" onClick={() => {
-                const channel = new MessageChannel();
-                window.parent.postMessage({
-                    type: "LeaveFullScreenRequest",
-                }, "*", [channel.port2]);
-            }} className="back-to-space">Back To Space</a>
+            {twoColumn && <div className="left-column-background"></div>}
+            <div className="noise"></div>
 
-            <div className="logo"></div>
+            <div className="root-page-content">
+                <a href="#" onClick={() => {
+                    const channel = new MessageChannel();
+                    window.parent.postMessage({
+                        type: "LeaveFullScreenRequest",
+                    }, "*", [channel.port2]);
+                }} className="back-to-space">Back To Space</a>
 
-            <div className="root-page-columns">
-                {valentines && <div className="incoming-valentines-column">
-                    <div className="promo-header">Someone crushed into you</div>
+                <div className="logo"></div>
 
-                    {rows.map(row => <IncomingValentineRow valentines={row}/>)}
-                </div>}
+                <div className="root-page-columns">
+                    {valentines && valentines.length > 0 && <div className="incoming-valentines-column">
+                        <div className="promo-header">Someone crushed into you</div>
 
-                <div className="send-valentine-column">
-                    <div className="promo-header">Make this Valentine's Day very special!</div>
-                    <div className="promo-text">Our secure and confidential service ensures that your feelings will
-                        reach your crush without revealing your identity. Choose from our selection of beautiful
-                        valentines and add a secret message if you wish.
+                        {rows.map(row => <IncomingValentineRow valentines={row}/>)}
+                    </div>}
+
+                    <div className="send-valentine-column">
+                        <div className="promo-header">Make this Valentine's Day very special!</div>
+                        <div className="promo-text">Our secure and confidential service ensures that your feelings will
+                            reach your crush without revealing your identity. Choose from our selection of beautiful
+                            valentines and add a secret message if you wish.
+                        </div>
+
+                        <Button title="Send secret valentine" action={() => {
+                            setPage({kind: "sendForm"})
+                        }}/>
                     </div>
-
-                    <Button title="Send secret valentine" action={() => {
-                        setPage({kind: "sendForm"})
-                    }}/>
                 </div>
             </div>
         </div>
