@@ -9,6 +9,7 @@
 .profile-selector-target {
     display: flex;
     flex-direction: row;
+    cursor: pointer;
 }
 
 .profile-selector-menu {

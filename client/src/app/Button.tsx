@@ -1,5 +1,6 @@
 import * as React from 'react';
 import "./Button.css"
+import {ReactNode} from "react";
 
 type Props = {
     title: string;
@@ -8,7 +9,7 @@ type Props = {
 
 export const Button = ({title, action}: Props) => {
     return (
-        <div className="button" onClick={action}>
+        <div className="button button-label-hover-container" onClick={action}>
             <div className="button-label">
                 <div className="button-label-label-text-2 button-label-transition">{title}</div>
                 <div className="button-label-label-text-1 button-label-transition">{title}</div>
@@ -19,13 +20,13 @@ export const Button = ({title, action}: Props) => {
 }
 
 type ButtonTitleProps = {
-    title: string
+    children: ReactNode
 }
 
-export const ButtonTitle = ({title}: ButtonTitleProps) => (
+export const ButtonTitle = ({children}: ButtonTitleProps) => (
     <div className="button-label">
-        <div className="button-label-label-text-2 button-label-transition">{title}</div>
-        <div className="button-label-label-text-1 button-label-transition">{title}</div>
-        <div className="button-label-label-text">{title}</div>
+        <div className="button-label-label-text-2 button-label-transition">{children}</div>
+        <div className="button-label-label-text-1 button-label-transition">{children}</div>
+        <div className="button-label-label-text">{children}</div>
     </div>
 )

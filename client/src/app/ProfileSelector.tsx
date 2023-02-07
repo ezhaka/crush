@@ -5,7 +5,8 @@ import {UserTokenData} from "../UserTokenData";
 import {ReactNode, useState} from "react";
 import "./ProfileSelector.css"
 import {ButtonTitle} from "./Button";
-import { StylesConfig } from "react-select";
+import {StylesConfig} from "react-select";
+import "../../resources/font/css/fontello.css"
 
 export interface ProfileSelectItem extends Profile {
     value: string;
@@ -23,7 +24,11 @@ const selectStyles: StylesConfig<ProfileSelectItem, false> = {
         ...provided,
         margin: 8,
         background: 'transparent',
-        color: 'white'
+        color: 'white',
+        border: 'none',
+        borderWidth: 0,
+        borderColor: 'transparent',
+        boxShadow: 'none',
     }),
     input: (provided) => ({
         ...provided,
@@ -32,6 +37,15 @@ const selectStyles: StylesConfig<ProfileSelectItem, false> = {
     menu: () => ({
         boxShadow: 'inset 0 1px 0 rgba(0, 0, 0, 0.1)'
     }),
+    option: (provided, {isFocused, isSelected}) => ({
+        ...provided,
+        background: 'transparent',
+        ...(isFocused ? {background: '#EB1863'} : {})
+    }),
+    menuList: (provided) => ({
+        ...provided,
+        paddingBottom: 0
+    })
 };
 
 export const ProfileSelector = ({value, onChange, token}: Props) => {
@@ -50,11 +64,18 @@ export const ProfileSelector = ({value, onChange, token}: Props) => {
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             target={
-                <div className="profile-selector-target" onClick={() => setIsOpen((prev) => !prev)}>
+                <div
+                    className="profile-selector-target button-label-hover-container"
+                    onClick={() => setIsOpen((prev) => !prev)}
+                >
                     <div>
-                        <ButtonTitle title={value ? value.label : 'CHOOSE YOUR CRUSH'}/>
+                        <ButtonTitle>
+                            <span>
+                                {value ? value.label : 'CHOOSE YOUR CRUSH'}
+                                <span className={isOpen ? "icon-arrow-up" : "icon-arrow-down"}/>
+                            </span>
+                        </ButtonTitle>
                     </div>
-                    <ChevronDown/>
                 </div>
             }
         >
@@ -62,7 +83,7 @@ export const ProfileSelector = ({value, onChange, token}: Props) => {
                 autoFocus
                 backspaceRemovesValue={false}
                 cacheOptions
-                components={{ DropdownIndicator: null, IndicatorSeparator: null }}
+                components={{DropdownIndicator: null, IndicatorSeparator: null}}
                 controlShouldRenderValue={false}
                 defaultOptions
                 hideSelectedOptions={false}
@@ -87,13 +108,13 @@ export const ProfileSelector = ({value, onChange, token}: Props) => {
 const Menu = (props: JSX.IntrinsicElements['div']) => {
     return (
         <div className="profile-selector-menu"
-            {...props}
+             {...props}
         />
     );
 };
 const Blanket = (props: JSX.IntrinsicElements['div']) => (
     <div className="profile-selector-blanket"
-        {...props}
+         {...props}
     />
 );
 const Dropdown = ({
@@ -110,36 +131,6 @@ const Dropdown = ({
     <div className="profile-selector-dropdown">
         {target}
         {isOpen ? <Menu>{children}</Menu> : null}
-        {isOpen ? <Blanket onClick={onClose} /> : null}
+        {isOpen ? <Blanket onClick={onClose}/> : null}
     </div>
-);
-const Svg = (p: JSX.IntrinsicElements['svg']) => (
-    <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        focusable="false"
-        role="presentation"
-        {...p}
-    />
-);
-const DropdownIndicator = () => (
-    <div className="profile-selector-dropdown-indicator">
-        <Svg>
-            <path
-                d="M16.436 15.085l3.94 4.01a1 1 0 0 1-1.425 1.402l-3.938-4.006a7.5 7.5 0 1 1 1.423-1.406zM10.5 16a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11z"
-                fill="currentColor"
-                fillRule="evenodd"
-            />
-        </Svg>
-    </div>
-);
-const ChevronDown = () => (
-    <Svg className="profile-selector-chevron-down">
-        <path
-            d="M8.292 10.293a1.009 1.009 0 0 0 0 1.419l2.939 2.965c.218.215.5.322.779.322s.556-.107.769-.322l2.93-2.955a1.01 1.01 0 0 0 0-1.419.987.987 0 0 0-1.406 0l-2.298 2.317-2.307-2.327a.99.99 0 0 0-1.406 0z"
-            fill="currentColor"
-            fillRule="evenodd"
-        />
-    </Svg>
 );

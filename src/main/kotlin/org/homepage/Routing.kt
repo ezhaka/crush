@@ -19,6 +19,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 import space.jetbrains.api.runtime.BatchInfo
+import space.jetbrains.api.runtime.NotFoundException
 import space.jetbrains.api.runtime.Space
 import space.jetbrains.api.runtime.helpers.RequestAdapter
 import space.jetbrains.api.runtime.helpers.SpaceHttpResponse
@@ -28,6 +29,7 @@ import space.jetbrains.api.runtime.resources.teamDirectory
 import space.jetbrains.api.runtime.types.ApplicationIdentifier
 import space.jetbrains.api.runtime.types.GlobalPermissionContextIdentifier
 import space.jetbrains.api.runtime.types.InitPayload
+import space.jetbrains.api.runtime.types.ProfileIdentifier
 
 fun Application.configureRouting() {
     val log = LoggerFactory.getLogger("Routing.kt")
@@ -86,9 +88,20 @@ fun Application.configureRouting() {
             }
         }
 
-        post<Routes.SendValentine> { params ->
+        post("/homepage/send-valentine") {
+            val params = call.receive<Routes.SendValentineBody>()
+
             runAuthorized { spaceTokenInfo ->
                 val spaceAppInstance = spaceTokenInfo.spaceAppInstance
+
+                // check that profile exists
+                try {
+                    spaceTokenInfo.appSpaceClient().teamDirectory.profiles.getProfile(ProfileIdentifier.Id(params.receiverId))
+                } catch (e: NotFoundException) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@runAuthorized
+                }
+
                 val row = transaction {
                     IncomingValentineTable.insert {
                         it[this.serverUrl] = spaceAppInstance.spaceServer.serverUrl

@@ -38,10 +38,7 @@
 
 .logo {
     flex-shrink: 0;
-    width: 327px;
-    height: 255px;
     margin-bottom: 110px;
-    background-image: url('./../../resources/logo.svg');
 }
 
 .root-page_two-column .logo {
@@ -78,16 +75,6 @@
     width: 50%;
 }
 
-.promo-header {
-    color: #FFD1FA;
-    font-style: normal;
-    font-weight: 600;
-    font-size: 25px;
-    line-height: 28px;
-    text-align: center;
-    margin-bottom: 38px;
-}
-
 .root-page_two-column .send-valentine-column .promo-header {
     color: #A0001D;
 }
@@ -96,17 +83,6 @@
     color: white;
     position: sticky;
     top: 16px;
-}
-
-.promo-text {
-    color: #44000C;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 20px;
-    line-height: 28px;
-    max-width: 560px;
-    text-align: center;
-    margin-bottom: 38px;
 }
 
 .incoming-valentines-row {

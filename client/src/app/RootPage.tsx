@@ -2,6 +2,7 @@ import * as React from 'react';
 import {Button} from "./Button";
 import {useContext, useMemo} from "react";
 import {PageContext} from "./App";
+import "./Common.css"
 import "./RootPage.css"
 import {valentineTypes} from "./ValentineType";
 import {UserTokenData} from "../UserTokenData";

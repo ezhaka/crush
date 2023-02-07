@@ -32,7 +32,9 @@
     left: -2px;
 }
 
-.button:hover .button-label-label-text-1 {
+.button-label-hover-container {}
+
+.button-label-hover-container:hover .button-label-label-text-1 {
     color: #FF14CB;
     top: 4px;
     left: -2px;
@@ -47,7 +49,7 @@
     left: 1px;
 }
 
-.button:hover .button-label-label-text-2 {
+.button-label-hover-container:hover .button-label-label-text-2 {
     color: #1A75FD;
     top: -4px;
     left: 3px;

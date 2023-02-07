@@ -4,11 +4,15 @@
     background: rgba(0, 0, 0, 0.8);
 }
 
-.close-link {
-    background: url(./../../resources/cross.svg);
-    width: 37px;
-    height: 38px;
+.icon-close {
     position: absolute;
     top: 72px;
     right: 72px;
+    color: white;
+    opacity: 0.3;
+    font-size: 36px;
+}
+
+.icon-close:hover {
+    opacity: 0.5;
 }

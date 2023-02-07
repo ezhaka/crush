@@ -1,4 +1,4 @@
-rootProject.name = "app-homepage-react"
+rootProject.name = "secret-crush"
 
 pluginManagement {
     resolutionStrategy {

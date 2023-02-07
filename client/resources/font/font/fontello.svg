@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg">
+<metadata>Copyright (C) 2023 by original authors @ fontello.com</metadata>
+<defs>
+<font id="fontello" horiz-adv-x="1000" >
+<font-face font-family="fontello" font-weight="400" font-stretch="normal" units-per-em="1000" ascent="850" descent="-150" />
+<missing-glyph horiz-adv-x="1000" />
+<glyph glyph-name="arrow-down" unicode="&#xe800;" d="M481 138l-431 373 63 64 368-350 407 325 62-65-469-347z" horiz-adv-x="1000" />
+
+<glyph glyph-name="arrow-left" unicode="&#xe801;" d="M200 344l538-482 62 59-495 423 473 413-59 93-519-506z" horiz-adv-x="1000" />
+
+<glyph glyph-name="arrow-right" unicode="&#xe802;" d="M800 344l-537-482-63 59 495 423-473 413 59 93 519-506z" horiz-adv-x="1000" />
+
+<glyph glyph-name="arrow-up" unicode="&#xe803;" d="M519 575l431-373-62-64-369 350-406-325-63 64 469 348z" horiz-adv-x="1000" />
+
+<glyph glyph-name="close" unicode="&#xe804;" d="M513 394l-435 431-28-58 415-421-415-411 51-55 421 409 402-409 51 55-404 401 404 392-28 97-434-431z" horiz-adv-x="1000" />
+</font>
+</defs>
+</svg>

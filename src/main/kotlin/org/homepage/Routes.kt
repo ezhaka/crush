@@ -1,11 +1,12 @@
 import io.ktor.server.locations.*
+import kotlinx.serialization.Serializable
 
 object Routes {
     @Location("/homepage/get-profiles")
     class GetProfiles(val query: String)
 
-    @Location("/homepage/send-valentine")
-    class SendValentine(val receiverId: String, val messageText: String)
+    @Serializable
+    class SendValentineBody(val receiverId: String, val messageText: String)
 
     @Location("/homepage/read-valentine")
     class ReadValentine(val valentineId: Long)
