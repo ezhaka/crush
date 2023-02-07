@@ -4,9 +4,11 @@ import {useContext, useMemo} from "react";
 import {PageContext} from "./App";
 import "./RootPage.css"
 import {valentineTypes} from "./ValentineType";
+import {UserTokenData} from "../UserTokenData";
 
 type Props = {
-    valentines: Valentine[]
+    valentines: Valentine[];
+    token: UserTokenData;
 }
 
 const IncomingValentine = ({valentine}: { valentine: Valentine }) => {
@@ -31,7 +33,7 @@ const IncomingValentineRow = ({valentines}: { valentines: Valentine[] }) => {
     </div>)
 }
 
-export const RootPage = ({valentines}: Props) => {
+export const RootPage = ({valentines, token}: Props) => {
     const setPage = useContext(PageContext)
 
     const rows = useMemo(() => spreadToRows(valentines), [valentines])
@@ -44,16 +46,9 @@ export const RootPage = ({valentines}: Props) => {
             <div className="noise"></div>
 
             <div className="root-page-content">
-                <a href="#" onClick={() => {
-                    const channel = new MessageChannel();
-                    window.parent.postMessage({
-                        type: "LeaveFullScreenRequest",
-                    }, "*", [channel.port2]);
-                }} className="back-to-space">Back To Space</a>
-
                 <div className="logo"></div>
 
-                <div className="root-page-columns">
+                {valentines !== undefined && token && <div className="root-page-columns">
                     {valentines && valentines.length > 0 && <div className="incoming-valentines-column">
                         <div className="promo-header">Someone crushed into you</div>
 
@@ -71,7 +66,7 @@ export const RootPage = ({valentines}: Props) => {
                             setPage({kind: "sendForm"})
                         }}/>
                     </div>
-                </div>
+                </div>}
             </div>
         </div>
 

@@ -1,14 +1,16 @@
 .root-page, .root-page_two-column {
+    position: relative;
     min-height: 100%;
     padding: 16px 0;
     background: url('./../../resources/background.svg') no-repeat top center, linear-gradient(120.21deg, #F283DA 1.69%, #FFD2E0 100%, #F94D80 100%);
     background-size: cover;
     mix-blend-mode: soft-light;
+    background-attachment: fixed;
 }
 
 .noise {
     background: url('./../../resources/noise.png');
-    position: absolute;
+    position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
@@ -34,27 +36,9 @@
     align-items: center;
 }
 
-.back-to-space {
-    position: absolute;
-    top: 40px;
-    left: 60px;
-    color: white;
-    text-decoration: none;
-}
-
-.back-to-space:hover {
-    color: white;
-    text-decoration: none;
-}
-
-.back-to-space:active {
-    color: white;
-    text-decoration: none;
-}
-
 .logo {
     flex-shrink: 0;
-    width: 305px;
+    width: 327px;
     height: 255px;
     margin-bottom: 110px;
     background-image: url('./../../resources/logo.svg');
@@ -76,6 +60,9 @@
     width: 100%;
     max-width: 720px;
     align-items: center;
+    align-self: flex-start;
+    position: sticky;
+    top: 16px;
 }
 
 .incoming-valentines-column,
@@ -107,6 +94,8 @@
 
 .root-page_two-column .incoming-valentines-column .promo-header {
     color: white;
+    position: sticky;
+    top: 16px;
 }
 
 .promo-text {

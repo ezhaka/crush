@@ -44,7 +44,7 @@ function App() {
         fetch().catch(console.error)
     }, [])
 
-    const [valentines, setValentines] = useState<Valentine[]>()
+    const [valentines, setValentines] = useState<Valentine[] | undefined>(undefined)
 
     useEffect(() => {
         const fetch = async () => {
@@ -64,7 +64,7 @@ function App() {
         <>
             <PageContext.Provider value={setPage}>
                 <div className="page">
-                    {page.kind == "root" && <RootPage valentines={valentines} />}
+                    {page.kind == "root" && <RootPage valentines={valentines} token={token} />}
                     {page.kind == "sendForm" && token && <SendValentineForm token={token}/>}
                     {page.kind == "valentine" && <ValentineViewPage valentine={page.valentine} token={token}/>}
                 </div>

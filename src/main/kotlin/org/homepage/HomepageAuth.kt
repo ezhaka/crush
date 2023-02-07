@@ -52,10 +52,5 @@ data class SpaceTokenInfo(
 fun SpaceTokenInfo.appSpaceClient() =
     SpaceClient(spaceHttpClient, spaceAppInstance, SpaceAuth.ClientCredentials())
 
-/**
- * Space API methods called with this client will be called on behalf of the user.
- */
-fun SpaceTokenInfo.userSpaceClient() =
-    SpaceClient(spaceHttpClient, spaceAppInstance, SpaceAuth.Token(this.spaceAccessToken))
 
 private val log: Logger = LoggerFactory.getLogger("Routing.kt")
