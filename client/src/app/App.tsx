@@ -43,7 +43,8 @@ function App() {
 
     useEffect(() => {
         if (token) {
-            setWs(new ReconnectingWebSocket(`ws://${window.location.host}/api/websocket?token=${token.token}`))
+            const protocol = window.location.hostname === 'localhost' ? 'ws' : 'wss'
+            setWs(new ReconnectingWebSocket(`${protocol}://${window.location.host}/api/websocket?token=${token.token}`))
         }
     }, [token])
 
