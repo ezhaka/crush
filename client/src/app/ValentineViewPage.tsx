@@ -18,7 +18,7 @@ export const ValentineViewPage = ({valentine, token}: Props) => {
     useEffect(() => {
         const fetch = async () => {
             if (token) {
-                await httpPut(`/homepage/read-valentine?valentineId=${valentine.id}`, token.token, {})
+                await httpPut(`/api/read-valentine?valentineId=${valentine.id}`, token.token, {})
             }
         }
 

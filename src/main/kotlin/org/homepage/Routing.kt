@@ -1,6 +1,5 @@
 package org.homepage
 
-import AppHasPermissionsService
 import Routes
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -12,8 +11,11 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
+import kotlinx.coroutines.channels.SendChannel
+import org.homepage.actors.MainActorMsg
+import org.homepage.actors.ValentineMod
 import org.homepage.db.IncomingValentineTable
-import org.homepage.services.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
@@ -30,7 +32,7 @@ import space.jetbrains.api.runtime.types.GlobalPermissionContextIdentifier
 import space.jetbrains.api.runtime.types.InitPayload
 import space.jetbrains.api.runtime.types.ProfileIdentifier
 
-fun Application.configureRouting() {
+fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
     val log = LoggerFactory.getLogger("Routing.kt")
 
     install(Locations)
@@ -87,7 +89,7 @@ fun Application.configureRouting() {
             }
         }
 
-        post("/homepage/send-valentine") {
+        post("/api/send-valentine") {
             val params = call.receive<Routes.SendValentineBody>()
 
             runAuthorized { spaceTokenInfo ->
@@ -115,29 +117,41 @@ fun Application.configureRouting() {
                     }.resultedValues!!.first()
                 }
 
-                sendModificationEvent(spaceAppInstance, row[IncomingValentineTable.id].value, params.receiverId)
+                val id = row[IncomingValentineTable.id].value
+
+                mainActor.trySend(
+                    MainActorMsg.Modification(
+                        ValentineMod.Created(
+                            spaceAppInstance,
+                            SpaceGlobalUserId(spaceAppInstance.spaceServer.serverUrl, params.receiverId),
+                            IncomingValentine(id, params.messageText, params.cardType, read = false)
+                        )
+                    )
+                )
 
                 call.respond(HttpStatusCode.OK)
             }
         }
 
-        get<Routes.GetIncomingValentines> { params ->
-            runAuthorized { spaceTokenInfo ->
-                val valentines = transaction {
-                    IncomingValentineTable
-                        .select { matchUser(spaceTokenInfo) }
-                        .map {
-                            IncomingValentine(
-                                it[IncomingValentineTable.id].value,
-                                it[IncomingValentineTable.message],
-                                it[IncomingValentineTable.cardType]
-                            )
-                        }
-                        .sortedByDescending { it.id }
-                }
-
-                call.respond(HttpStatusCode.OK, IncomingValentineListResponse(valentines))
+        webSocket("/api/websocket") {
+            val rawToken = call.parameters["token"]
+            if (rawToken == null) {
+                call.respond(HttpStatusCode.Unauthorized, "No token param is passed")
+                return@webSocket
             }
+
+            val token = getSpaceTokenInfo(rawToken)
+            if (token == null) {
+                call.respond(HttpStatusCode.Unauthorized, "Token is not found or invalid")
+                return@webSocket
+            }
+
+            // TODO: log every trySend
+            mainActor.trySend(MainActorMsg.ConnectionOpened(token.globalUserId(), this))
+
+            for (frame in incoming) {}
+
+            mainActor.trySend(MainActorMsg.ConnectionClosed(token.globalUserId(), this))
         }
 
         put<Routes.ReadValentine> { params ->
@@ -154,25 +168,32 @@ fun Application.configureRouting() {
                 }
 
                 if (rowsUpdated == 1) {
-                    sendModificationEvent(spaceAppInstance, params.valentineId, spaceTokenInfo.spaceUserId)
+                    mainActor.trySend(
+                        MainActorMsg.Modification(
+                            ValentineMod.Read(
+                                spaceAppInstance,
+                                params.valentineId,
+                                spaceTokenInfo.globalUserId(),
+                            )
+                        )
+                    )
+
                     call.respond(HttpStatusCode.OK)
                 } else {
                     call.respond(HttpStatusCode.NotFound)
                 }
             }
         }
-
-        get<Routes.AppHasPermissions> {
-            runAuthorized { spaceTokenInfo ->
-                call.respond(HttpStatusCode.OK, AppHasPermissionsService(spaceTokenInfo).appHasPermissions())
-            }
-        }
     }
 }
 
-private fun SqlExpressionBuilder.matchUser(spaceTokenInfo: SpaceTokenInfo) =
+fun SqlExpressionBuilder.matchUser(spaceTokenInfo: SpaceTokenInfo) =
     (IncomingValentineTable.serverUrl eq spaceTokenInfo.spaceAppInstance.spaceServer.serverUrl) and
             (IncomingValentineTable.receiver eq spaceTokenInfo.spaceUserId)
+
+fun SqlExpressionBuilder.matchUser(userId: SpaceGlobalUserId) =
+    (IncomingValentineTable.serverUrl eq userId.spaceServerUrl) and
+        (IncomingValentineTable.receiver eq userId.spaceUserId)
 
 private fun ktorRequestAdapter(call: ApplicationCall): RequestAdapter {
     return object : RequestAdapter {

@@ -2,7 +2,11 @@ package org.homepage
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
+import io.ktor.serialization.kotlinx.*
 import io.ktor.server.application.*
+import io.ktor.server.websocket.*
+import kotlinx.serialization.json.Json
+import org.homepage.actors.mainActor
 import org.homepage.db.initDbConnection
 import space.jetbrains.api.runtime.Space
 import space.jetbrains.api.runtime.SpaceAuthFlow
@@ -11,11 +15,15 @@ import space.jetbrains.api.runtime.ktorClientForSpace
 
 @Suppress("unused")
 fun Application.module() {
+    val mainActor = mainActor()
+
+    install(WebSockets) {
+        contentConverter = KotlinxWebsocketSerializationConverter(Json)
+    }
+
     initDbConnection()
 
-    configureRouting()
-
-    processEvents()
+    configureRouting(mainActor)
 
     println(
         "Public install url ${

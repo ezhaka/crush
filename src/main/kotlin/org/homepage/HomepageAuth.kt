@@ -27,11 +27,16 @@ suspend fun PipelineContext<Unit, ApplicationCall>.runAuthorized(handler: suspen
     }
 }
 
-private suspend fun PipelineContext<Unit, ApplicationCall>.getSpaceTokenInfo(): SpaceTokenInfo? =
-    (context.request.parseAuthorizationHeader() as? HttpAuthHeader.Single)?.blob
-        ?.let { getSpaceTokenInfo(it) }
+private suspend fun PipelineContext<Unit, ApplicationCall>.getSpaceTokenInfo(): SpaceTokenInfo? {
+    return getSpaceTokenInfo(context.request)
+}
 
-private suspend fun getSpaceTokenInfo(spaceUserToken: String): SpaceTokenInfo? {
+suspend fun getSpaceTokenInfo(request: ApplicationRequest): SpaceTokenInfo? {
+    return (request.parseAuthorizationHeader() as? HttpAuthHeader.Single)?.blob
+        ?.let { getSpaceTokenInfo(it) }
+}
+
+suspend fun getSpaceTokenInfo(spaceUserToken: String): SpaceTokenInfo? {
     val jwtClaimsSet = JWTParser.parse(spaceUserToken).jwtClaimsSet
     val spaceAppInstance =
         jwtClaimsSet.audience.singleOrNull()?.let { AppInstanceStorage.loadAppInstance(it) } ?: return null
@@ -39,10 +44,20 @@ private suspend fun getSpaceTokenInfo(spaceUserToken: String): SpaceTokenInfo? {
     return SpaceTokenInfo(spaceAppInstance, spaceUserId, spaceUserToken)
 }
 
+data class SpaceGlobalUserId(
+    val spaceServerUrl: String,
+    val spaceUserId: String,
+)
+
 data class SpaceTokenInfo(
     val spaceAppInstance: SpaceAppInstance,
     val spaceUserId: String,
     val spaceAccessToken: String,
+)
+
+fun SpaceTokenInfo.globalUserId() = SpaceGlobalUserId(
+    spaceServerUrl = spaceAppInstance.spaceServer.serverUrl,
+    spaceUserId = spaceUserId,
 )
 
 /**

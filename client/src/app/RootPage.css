@@ -4,7 +4,6 @@
     padding: 16px 0;
     background: url('./../../resources/background.svg') no-repeat top center, linear-gradient(120.21deg, #F283DA 1.69%, #FFD2E0 100%, #F94D80 100%);
     background-size: cover;
-    mix-blend-mode: soft-light;
     background-attachment: fixed;
 }
 
@@ -91,6 +90,11 @@
     align-items: center;
     justify-content: center;
     gap: 16px;
+}
+
+.incoming-valentine:hover {
+    transform: scale(1.1);
+    transition: transform 150ms;
 }
 
 .incoming-valentine img {

@@ -1,11 +1,12 @@
 import * as React from 'react';
-import {createContext, useCallback, useEffect, useState} from "react";
+import {createContext, useCallback, useEffect, useRef, useState} from "react";
 import {fetchSpaceUserToken, UserTokenData} from "../UserTokenData";
 import {SendValentineForm} from './SendValentineForm';
 import {httpGet} from "../api/http";
 import {ValentineViewPage} from "./ValentineViewPage";
 import "./App.css"
-import { RootPage } from './RootPage';
+import {RootPage} from './RootPage';
+import ReconnectingWebSocket from "reconnecting-websocket";
 
 interface RootPage {
     kind: "root";
@@ -25,13 +26,7 @@ type Page = RootPage | SendFormPage | ValentinePage
 export const PageContext = createContext<((page: Page) => void) | undefined>(undefined)
 
 function App() {
-    const onClick = useCallback(() => {
-        const channel = new MessageChannel();
-        window.parent.postMessage({
-            type: "NavigateBackRequest",
-        }, "*", [channel.port2]);
-    }, [])
-
+    const [page, setPage] = useState<Page>({kind: "root"})
     const [token, setToken] = useState<UserTokenData>()
 
     useEffect(() => {
@@ -44,26 +39,51 @@ function App() {
     }, [])
 
     const [valentines, setValentines] = useState<Valentine[] | undefined>(undefined)
+    const [ws, setWs] = useState<ReconnectingWebSocket>()
 
     useEffect(() => {
-        const fetch = async () => {
-            if (token) {
-                const res = await httpGet(`/homepage/get-incoming-valentines`, token.token)
-                const json = await res.json()
-                setValentines(json.data)
+        if (token) {
+            setWs(new ReconnectingWebSocket(`ws://${window.location.host}/api/websocket?token=${token.token}`))
+        }
+    }, [token])
+
+    useEffect(() => {
+        if (!ws) return
+
+        const listener = (event: MessageEvent<any>) => {
+            const message = JSON.parse(event.data)
+
+            const type = message.type;
+            const dotIndex = type.lastIndexOf('.')
+
+            switch (type.substring(dotIndex + 1)) {
+                case 'ValentineListInit': {
+                    setValentines(message.data)
+                    break
+                }
+                case 'ValentineReceived': {
+                    setValentines([message.valentine, ...(valentines || [])])
+                    break
+                }
+                case 'ValentineRead': {
+                    setValentines(valentines.map(v => v.id === message.valentineId ? {...v, read: true} : v))
+                    break
+                }
             }
         }
 
-        fetch().catch(console.error)
-    }, [token])
+        ws.addEventListener("message", listener)
 
-    const [page, setPage] = useState<Page>({kind: "root"})
+        return () => {
+            ws.removeEventListener("message", listener)
+        }
+    }, [ws, valentines, setValentines])
 
     return (
         <>
             <PageContext.Provider value={setPage}>
                 <div className="page">
-                    {page.kind == "root" && <RootPage valentines={valentines} token={token} />}
+                    {page.kind == "root" && <RootPage valentines={valentines} token={token}/>}
                     {page.kind == "sendForm" && token && <SendValentineForm token={token}/>}
                     {page.kind == "valentine" && <ValentineViewPage valentine={page.valentine} token={token}/>}
                 </div>

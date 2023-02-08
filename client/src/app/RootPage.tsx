@@ -15,6 +15,7 @@ type Props = {
 const IncomingValentine = ({valentine}: { valentine: Valentine }) => {
     const valentineType = valentineTypes[valentine.type]
     const src = require(`./../../resources/valentines/${valentineType.name}-sticker.png`)
+    const srcUnread = require(`./../../resources/valentines/${valentineType.name}-sticker-new.png`)
     const setPage = useContext(PageContext)
 
     return (<a
@@ -24,13 +25,13 @@ const IncomingValentine = ({valentine}: { valentine: Valentine }) => {
             e.preventDefault()
             setPage({kind: "valentine", valentine})
         }}>
-        <img src={src}/>
+        <img src={valentine.read ? src : srcUnread}/>
     </a>)
 }
 
 const IncomingValentineRow = ({valentines}: { valentines: Valentine[] }) => {
     return (<div className="incoming-valentines-row">
-        {valentines.map(v => <IncomingValentine valentine={v}/>)}
+        {valentines.map(v => <IncomingValentine key={v.id} valentine={v}/>)}
     </div>)
 }
 
@@ -53,7 +54,7 @@ export const RootPage = ({valentines, token}: Props) => {
                     {valentines && valentines.length > 0 && <div className="incoming-valentines-column">
                         <div className="promo-header">Someone crushed into you</div>
 
-                        {rows.map(row => <IncomingValentineRow valentines={row}/>)}
+                        {rows.map((row, index) => <IncomingValentineRow key={index} valentines={row}/>)}
                     </div>}
 
                     <div className="send-valentine-column">

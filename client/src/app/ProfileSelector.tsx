@@ -54,7 +54,7 @@ export const ProfileSelector = ({value, onChange, token}: Props) => {
     const loadOptions = async (
         inputValue: string,
     ) => {
-        const responseRaw = await httpGet(`/homepage/get-profiles?query=${inputValue || ''}`, token.token)
+        const responseRaw = await httpGet(`/api/get-profiles?query=${inputValue || ''}`, token.token)
         const response = await responseRaw.json() as ProfileListResponse
         return response.data.map(p => ({...p, value: p.id, label: `${p.firstName} ${p.lastName}`}))
     };

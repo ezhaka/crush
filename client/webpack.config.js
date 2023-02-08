@@ -18,6 +18,7 @@ module.exports = {
             {
                 context: ['/api', '/homepage', '/health'],
                 target: 'http://localhost:8080',
+                ws: true
             },
         ],
     },

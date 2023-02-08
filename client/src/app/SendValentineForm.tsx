@@ -30,7 +30,7 @@ export const SendValentineForm = ({token}: Props) => {
                 setTimeout(() => setShakeEmpty(false), 1000)
             }
         } else {
-            httpPost(`/homepage/send-valentine`, token.token, {
+            httpPost(`/api/send-valentine`, token.token, {
                 receiverId: profile?.id,
                 messageText: message,
                 cardType: activeSlide

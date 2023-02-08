@@ -32,6 +32,8 @@
     "react-contenteditable": "^3.3.6",
     "react-select": "^5.7.0",
     "react-simply-carousel": "^8.4.5",
+    "reconnecting-websocket": "^4.4.0",
+    "robust-websocket": "^1.0.0",
     "style-loader": "^3.3.1",
     "svg-inline-loader": "^0.8.2",
     "url-loader": "^4.1.1"
