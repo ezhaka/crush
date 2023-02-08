@@ -36,7 +36,6 @@ function App() {
 
     useEffect(() => {
         const fetch = async () => {
-            // await approvePermissionRequest()
             const token = await fetchSpaceUserToken()
             setToken(token)
         }

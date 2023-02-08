@@ -17,7 +17,7 @@ type Props = {
 
 export const SendValentineForm = ({token}: Props) => {
     const [profile, setProfile] = useState<ProfileSelectItem>()
-    const [message, setMessage] = useState<string>()
+    const [message, setMessage] = useState<string>('')
     const [posted, setPosted] = useState<boolean>(false)
     const [shakeEmpty, setShakeEmpty] = useState<boolean>(false)
 
@@ -36,6 +36,8 @@ export const SendValentineForm = ({token}: Props) => {
                 .then((response) => {
                     if (response.ok) {
                         setPosted(true)
+                    } else {
+                        // TODO: show error toast
                     }
                 })
         }

@@ -128,6 +128,7 @@ fun Application.configureRouting() {
                                 it[IncomingValentineTable.type]
                             )
                         }
+                        .sortedByDescending { it.id }
                 }
 
                 call.respond(HttpStatusCode.OK, IncomingValentineListResponse(valentines))
