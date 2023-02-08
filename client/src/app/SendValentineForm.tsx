@@ -10,6 +10,7 @@ import {valentineTypes} from "./ValentineType";
 import {ValentineEditor} from "./ValentineEditor";
 import {CloseableOverlay} from "./CloseableOverlay";
 import {PageContext} from "./App";
+import Carousel from "react-simply-carousel";
 
 type Props = {
     token: UserTokenData;
@@ -20,6 +21,7 @@ export const SendValentineForm = ({token}: Props) => {
     const [message, setMessage] = useState<string>('')
     const [posted, setPosted] = useState<boolean>(false)
     const [shakeEmpty, setShakeEmpty] = useState<boolean>(false)
+    const [activeSlide, setActiveSlide] = useState(0);
 
     const submit = () => {
         if (!profile) {
@@ -28,10 +30,10 @@ export const SendValentineForm = ({token}: Props) => {
                 setTimeout(() => setShakeEmpty(false), 1000)
             }
         } else {
-            // TODO: all to body!
             httpPost(`/homepage/send-valentine`, token.token, {
                 receiverId: profile?.id,
-                messageText: message
+                messageText: message,
+                cardType: activeSlide
             })
                 .then((response) => {
                     if (response.ok) {
@@ -43,13 +45,53 @@ export const SendValentineForm = ({token}: Props) => {
         }
     }
 
+    let arrowStyles = {
+        alignSelf: "center",
+        background: "none",
+        border: "none",
+        padding: 0,
+        cursor: "pointer",
+    };
+
     return (
         <CloseableOverlay>
             {!posted && <div className="send-valentine-form">
                 <div className={shakeEmpty && 'shake-empty-dropdown'}>
                     <ProfileSelector value={profile} onChange={setProfile} token={token}/>
                 </div>
-                <ValentineEditor message={message} setMessage={setMessage} type={valentineTypes[0]}/>
+
+                <Carousel
+                    containerProps={{
+                        style: {
+                            width: "100%",
+                            maxWidth: "1280px",
+                            justifyContent: "space-between",
+                            userSelect: "text"
+                        }
+                    }}
+                    activeSlideIndex={activeSlide}
+                    activeSlideProps={{
+                        style: {
+                            background: "blue"
+                        }
+                    }}
+                    onRequestChange={setActiveSlide}
+                    forwardBtnProps={{
+                        children: <div className="icon-arrow-right carousel-arrow"></div>,
+                        style: arrowStyles
+                    }}
+                    backwardBtnProps={{
+                        children: <div className="icon-arrow-left carousel-arrow"></div>,
+                        style: arrowStyles
+                    }}
+                    itemsToShow={1}
+                    speed={200}
+                >
+                    {valentineTypes.map((item, index) => (
+                        <ValentineEditor key={index} message={message} setMessage={setMessage} type={item}/>
+                    ))}
+                </Carousel>
+
                 <Button title="SEND IT!" action={submit}/>
             </div>}
 

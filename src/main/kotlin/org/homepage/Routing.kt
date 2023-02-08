@@ -7,7 +7,6 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.locations.*
-import io.ktor.server.locations.post
 import io.ktor.server.locations.put
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
@@ -94,6 +93,11 @@ fun Application.configureRouting() {
             runAuthorized { spaceTokenInfo ->
                 val spaceAppInstance = spaceTokenInfo.spaceAppInstance
 
+                if (params.cardType < 0 || params.cardType > 4) {
+                    call.respond(HttpStatusCode.BadRequest, "Card type should be in range 0..4, got ${params.cardType}")
+                    return@runAuthorized
+                }
+
                 // check that profile exists
                 try {
                     spaceTokenInfo.appSpaceClient().teamDirectory.profiles.getProfile(ProfileIdentifier.Id(params.receiverId))
@@ -107,6 +111,7 @@ fun Application.configureRouting() {
                         it[this.serverUrl] = spaceAppInstance.spaceServer.serverUrl
                         it[this.receiver] = params.receiverId
                         it[this.message] = params.messageText
+                        it[this.cardType] = params.cardType
                     }.resultedValues!!.first()
                 }
 
@@ -125,7 +130,7 @@ fun Application.configureRouting() {
                             IncomingValentine(
                                 it[IncomingValentineTable.id].value,
                                 it[IncomingValentineTable.message],
-                                it[IncomingValentineTable.type]
+                                it[IncomingValentineTable.cardType]
                             )
                         }
                         .sortedByDescending { it.id }

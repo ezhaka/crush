@@ -13,7 +13,7 @@ type Props = {
 
 export const ValentineViewPage = ({valentine, token}: Props) => {
     const type = valentineTypes[valentine.type]
-    const src = require(`./../../resources/valentines/${type.name}.png`)
+    const src = require(`./../../resources/valentines/${type.name}-fullscreen.png`)
 
     useEffect(() => {
         const fetch = async () => {
@@ -33,7 +33,9 @@ export const ValentineViewPage = ({valentine, token}: Props) => {
                     <div className="valentine-message" style={{
                         color: type.textColor,
                         top: type.top + 'px',
-                        left: type.left + 'px'
+                        left: type.left + 'px',
+                        width: type.width + 'px',
+                        height: type.height + 'px',
                     }}>
                         {valentine.message}
                     </div>

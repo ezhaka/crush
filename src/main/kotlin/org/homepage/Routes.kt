@@ -6,7 +6,7 @@ object Routes {
     class GetProfiles(val query: String)
 
     @Serializable
-    class SendValentineBody(val receiverId: String, val messageText: String)
+    class SendValentineBody(val receiverId: String, val messageText: String, val cardType: Int)
 
     @Location("/homepage/read-valentine")
     class ReadValentine(val valentineId: Long)

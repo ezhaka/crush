@@ -12,6 +12,12 @@
     font-weight: 400;
 }
 
+.valentine-view, .valentine-view img {
+    width: 960px;
+    height: 620px;
+}
+
 .valentine-message {
     position: absolute;
+    text-align: center;
 }

@@ -1,5 +1,5 @@
 .send-valentine-form {
-    gap: 24px;
+    gap: 16px;
     padding: 48px 0;
     display: flex;
     flex-direction: column;
@@ -36,6 +36,16 @@
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     perspective: 1000px;
+}
+
+.carousel-arrow {
+    font-size: 48px;
+    color: #FFFFFF;
+    opacity: 0.3;
+}
+
+.carousel-arrow:hover {
+    opacity: 0.5;
 }
 
 @keyframes shake {

@@ -9,7 +9,7 @@ type Props = {
 }
 
 export const ValentineEditor = ({type, message, setMessage}: Props) => {
-    const src = require(`./../../resources/valentines/${type.name}.png`)
+    const src = require(`./../../resources/valentines/${type.name}-fullscreen.png`)
 
     const limit = 100
 
@@ -23,7 +23,9 @@ export const ValentineEditor = ({type, message, setMessage}: Props) => {
                 style={{
                     color: type.textColor,
                     top: type.top + 'px',
-                    left: type.left + 'px'
+                    left: type.left + 'px',
+                    width: type.width + 'px',
+                    height: type.height + 'px',
                 }}
             />
         </div>

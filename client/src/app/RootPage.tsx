@@ -14,7 +14,7 @@ type Props = {
 
 const IncomingValentine = ({valentine}: { valentine: Valentine }) => {
     const valentineType = valentineTypes[valentine.type]
-    const src = require(`./../../resources/valentines/${valentineType.name}-small.png`)
+    const src = require(`./../../resources/valentines/${valentineType.name}-sticker.png`)
     const setPage = useContext(PageContext)
 
     return (<a
