@@ -38,16 +38,6 @@
     perspective: 1000px;
 }
 
-.carousel-arrow {
-    font-size: 48px;
-    color: #FFFFFF;
-    opacity: 0.3;
-}
-
-.carousel-arrow:hover {
-    opacity: 0.5;
-}
-
 @keyframes shake {
     10%, 90% {
         transform: translate3d(-1px, 0, 0);

@@ -1,0 +1,15 @@
+
+.carousel-container {
+    overflow-y: auto;
+    max-width: 100%;
+}
+
+.carousel-arrow {
+    font-size: 48px;
+    color: #FFFFFF;
+    opacity: 0.3;
+}
+
+.carousel-arrow:hover {
+    opacity: 0.5;
+}

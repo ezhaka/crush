@@ -24,3 +24,14 @@
     text-align: center;
     margin-bottom: 38px;
 }
+
+.hidden-scrollbar {
+    -ms-overflow-style: none;
+    scrollbarWidth: none;
+}
+
+.hidden-scrollbar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+

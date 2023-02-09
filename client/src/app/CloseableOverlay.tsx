@@ -13,16 +13,18 @@ export const CloseableOverlay = ({children}: Props) => {
     const setPage = useContext(PageContext)
 
     return (<div className="closeable-overlay">
-        <div className="noise" />
-        <a
-            href="#"
-            className="icon-close"
-            onClick={(e) => {
-                e.preventDefault()
-                setPage({kind: "root"})
-            }}>
-        </a>
+        <div className="noise"/>
+        <div className="closeable-overlay-limited-container">
+            <a
+                href="#"
+                className="icon-close"
+                onClick={(e) => {
+                    e.preventDefault()
+                    setPage({kind: "root"})
+                }}>
+            </a>
 
-        {children}
+            {children}
+        </div>
     </div>)
 }
