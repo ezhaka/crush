@@ -35,8 +35,8 @@ export const valentineTypes: ValentineType[] = [
     {
         name: 'cloud',
         textColor: '#3B467A',
-        left: 474,
-        top: 244,
+        left: 490,
+        top: 260,
         width: 296,
         height: 190,
     },
