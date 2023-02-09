@@ -97,6 +97,20 @@
     transition: transform 150ms;
 }
 
+.incoming-valentine {
+    position: relative;
+}
+
 .incoming-valentine img {
     width: 260px;
+}
+
+.new-heart {
+    position: absolute;
+    width: 70px;
+    height: 63px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: url('./../../resources/new.svg') no-repeat;
 }

@@ -25,6 +25,7 @@ const IncomingValentine = ({valentine}: { valentine: Valentine }) => {
             e.preventDefault()
             setPage({kind: "valentine", valentine})
         }}>
+        {!valentine.read && <div className="new-heart" /> }
         <img src={valentine.read ? src : srcUnread}/>
     </a>)
 }
