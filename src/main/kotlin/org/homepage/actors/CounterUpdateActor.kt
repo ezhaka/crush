@@ -9,11 +9,13 @@ import org.homepage.db.IncomingValentineTable
 import org.homepage.spaceHttpClient
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import space.jetbrains.api.runtime.SpaceAuth
 import space.jetbrains.api.runtime.SpaceClient
 
-private val log = LoggerFactory.getLogger("EventProcessor.kt")
+private val log: Logger = LoggerFactory.getLogger("CounterUpdateActor.kt")
+
 fun CoroutineScope.counterUpdateActor() = actor<ValentineMod>(capacity = 1024) {
     for (event in channel) {
         try {

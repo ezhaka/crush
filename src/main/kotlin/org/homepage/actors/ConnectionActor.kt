@@ -1,6 +1,7 @@
 package org.homepage.actors
 
 import io.ktor.server.websocket.*
+import io.ktor.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
@@ -11,6 +12,10 @@ import org.homepage.matchUser
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+private val log: Logger = LoggerFactory.getLogger("ConnectionActor.kt")
 
 class ConnectionActor(
     val session: WebSocketServerSession,
@@ -20,33 +25,38 @@ class ConnectionActor(
 fun CoroutineScope.connectionActor(ctx: MainActorMsg.ConnectionOpened) = ConnectionActor(
     ctx.session,
     actor<ValentineMod>(capacity = 1024) {
-        val valentines = transaction {
-            IncomingValentineTable
-                .select { matchUser(ctx.userId) }
-                .limit(1001)
-                .orderBy(IncomingValentineTable.id, SortOrder.DESC)
-                .map {
-                    IncomingValentine(
-                        it[IncomingValentineTable.id].value,
-                        it[IncomingValentineTable.message],
-                        it[IncomingValentineTable.cardType],
-                        it[IncomingValentineTable.read],
-                    )
-                }
-        }
+        try {
+            val valentines = transaction {
+                IncomingValentineTable
+                    .select { matchUser(ctx.userId) }
+                    .limit(1001)
+                    .orderBy(IncomingValentineTable.id, SortOrder.DESC)
+                    .map {
+                        IncomingValentine(
+                            it[IncomingValentineTable.id].value,
+                            it[IncomingValentineTable.message],
+                            it[IncomingValentineTable.cardType],
+                            it[IncomingValentineTable.read],
+                        )
+                    }
+            }
 
-        ctx.session.sendSerialized<WebsocketMessage>(WebsocketMessage.ValentineListInit(valentines))
+            ctx.session.sendSerialized<WebsocketMessage>(WebsocketMessage.ValentineListInit(valentines))
 
-        for (event in channel) {
-            when (event) {
-                is ValentineMod.Created -> {
-                    ctx.session.sendSerialized<WebsocketMessage>(WebsocketMessage.ValentineReceived(event.valentine))
-                }
+            for (event in channel) {
+                when (event) {
+                    is ValentineMod.Created -> {
+                        ctx.session.sendSerialized<WebsocketMessage>(WebsocketMessage.ValentineReceived(event.valentine))
+                    }
 
-                is ValentineMod.Read -> {
-                    ctx.session.sendSerialized<WebsocketMessage>(WebsocketMessage.ValentineRead(event.id))
+                    is ValentineMod.Read -> {
+                        ctx.session.sendSerialized<WebsocketMessage>(WebsocketMessage.ValentineRead(event.id))
+                    }
                 }
             }
+        } catch (e: Exception) {
+            log.error("An exception occurred in the connection actor", e)
+            ctx.session.close(CloseReason(CloseReason.Codes.INTERNAL_ERROR, "Something went wrong"))
         }
     }
 )

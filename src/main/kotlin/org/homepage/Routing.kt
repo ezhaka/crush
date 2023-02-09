@@ -12,9 +12,11 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
+import io.ktor.websocket.*
 import kotlinx.coroutines.channels.SendChannel
 import org.homepage.actors.MainActorMsg
 import org.homepage.actors.ValentineMod
+import org.homepage.actors.trySendWithLogging
 import org.homepage.db.IncomingValentineTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -119,14 +121,16 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
 
                 val id = row[IncomingValentineTable.id].value
 
-                mainActor.trySend(
+                mainActor.trySendWithLogging(
                     MainActorMsg.Modification(
                         ValentineMod.Created(
                             spaceAppInstance,
                             SpaceGlobalUserId(spaceAppInstance.spaceServer.serverUrl, params.receiverId),
                             IncomingValentine(id, params.messageText, params.cardType, read = false)
                         )
-                    )
+                    ),
+                    log,
+                    "mainActor inbox"
                 )
 
                 call.respond(HttpStatusCode.OK)
@@ -146,12 +150,19 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                 return@webSocket
             }
 
-            // TODO: log every trySend
-            mainActor.trySend(MainActorMsg.ConnectionOpened(token.globalUserId(), this))
+            mainActor.trySendWithLogging(
+                MainActorMsg.ConnectionOpened(token.globalUserId(), this),
+                log,
+                "mainActor inbox"
+            )
 
             for (frame in incoming) {}
 
-            mainActor.trySend(MainActorMsg.ConnectionClosed(token.globalUserId(), this))
+            mainActor.trySendWithLogging(
+                MainActorMsg.ConnectionClosed(token.globalUserId(), this),
+                log,
+                "mainActor inbox"
+            )
         }
 
         put<Routes.ReadValentine> { params ->
@@ -168,14 +179,16 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                 }
 
                 if (rowsUpdated == 1) {
-                    mainActor.trySend(
+                    mainActor.trySendWithLogging(
                         MainActorMsg.Modification(
                             ValentineMod.Read(
                                 spaceAppInstance,
                                 params.valentineId,
                                 spaceTokenInfo.globalUserId(),
                             )
-                        )
+                        ),
+                        log,
+                        "mainActor inbox"
                     )
 
                     call.respond(HttpStatusCode.OK)
