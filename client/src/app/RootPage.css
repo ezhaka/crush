@@ -114,3 +114,25 @@
     transform: translate(-50%, -50%);
     background: url('./../../resources/new.svg') no-repeat;
 }
+
+@media screen and (max-width: 960px) {
+    .left-column-background {
+        display: none;
+    }
+
+    .root-page-columns {
+        flex-direction: column-reverse;
+        align-items: center;
+        gap: 56px;
+    }
+
+    .root-page_two-column .incoming-valentines-column,
+    .root-page_two-column .send-valentine-column {
+        width: 100%;
+    }
+
+    .root-page_two-column .send-valentine-column {
+        align-self: center;
+        position: static;
+    }
+}
