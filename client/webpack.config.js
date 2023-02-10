@@ -2,10 +2,8 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    mode: 'development',
     entry: {
         app: './src/app/Main.tsx',
-        notification: './src/notification/Main.tsx',
     },
     devtool: 'inline-source-map',
     output: {
@@ -53,10 +51,5 @@ module.exports = {
             template: './src/app/index.html',
             chunks: ["app"],
         }),
-        new HtmlWebpackPlugin({
-            template: './src/notification/index.html',
-            filename: "notification.html",
-            chunks: ["notification"],
-        })
     ]
 }
