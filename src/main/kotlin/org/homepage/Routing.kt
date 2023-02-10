@@ -91,6 +91,30 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
             }
         }
 
+        get("/api/avatar/{userId}") {
+            val userId = call.parameters["userId"] ?: run {
+                call.respond(HttpStatusCode.NotFound)
+                return@get
+            }
+
+            runAuthorized { spaceTokenInfo ->
+                val client = spaceTokenInfo.appSpaceClient()
+                val smallAvatarTid = client.teamDirectory.profiles.getProfile(ProfileIdentifier.Id(userId)) {
+                    this.smallAvatar()
+                }.smallAvatar
+
+                val response = client.ktorClient.get("${client.server.serverUrl}/d/$smallAvatarTid") {
+                    this.expectSuccess = false
+                    bearerAuth(client.token().accessToken)
+                }
+
+                call.respondBytesWriter(response.contentType(), response.status, response.contentLength()) {
+                    val byteWriteChannel = this
+                    response.bodyAsChannel().copyTo(byteWriteChannel)
+                }
+            }
+        }
+
         post("/api/send-valentine") {
             val params = call.receive<Routes.SendValentineBody>()
 

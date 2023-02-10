@@ -2,7 +2,7 @@ import {httpGet} from "../api/http";
 import AsyncSelect from "react-select/async";
 import * as React from "react";
 import {UserTokenData} from "../UserTokenData";
-import {ReactNode, useState} from "react";
+import {ReactNode, useEffect, useState} from "react";
 import "./ProfileSelector.css"
 import {ButtonTitle} from "./Button";
 import {StylesConfig} from "react-select";
@@ -48,6 +48,29 @@ const selectStyles: StylesConfig<ProfileSelectItem, false> = {
     })
 };
 
+const ProfileAvatar = ({profileId, token}: {profileId: string, token: UserTokenData}) => {
+    const [blob, setBlob] = useState<string | undefined>()
+
+    useEffect(() => {
+        if (profileId) {
+            httpGet(`/api/avatar/${profileId}`, token.token)
+                .then(res => {
+                    if (res.ok) {
+                        res.blob().then(blob => {
+                            setBlob(URL.createObjectURL(blob))
+                        })
+                    } else {
+                        setBlob(undefined)
+                    }
+                })
+        }
+    }, [profileId, token])
+
+    return <div className="profile-avatar-container">
+        {blob ? <img className="profile-avatar" src={blob} /> : <div className="profile-avatar" />}
+    </div>
+}
+
 export const ProfileSelector = ({value, onChange, token}: Props) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -68,14 +91,14 @@ export const ProfileSelector = ({value, onChange, token}: Props) => {
                     className="profile-selector-target button-label-hover-container"
                     onClick={() => setIsOpen((prev) => !prev)}
                 >
-                    <div>
-                        <ButtonTitle>
-                            <span>
-                                {value ? value.label : 'CHOOSE YOUR CRUSH'}
-                                <span className={isOpen ? "icon-arrow-up" : "icon-arrow-down"}/>
-                            </span>
-                        </ButtonTitle>
-                    </div>
+                    {value && <ProfileAvatar profileId={value.id} token={token}/>}
+
+                    <ButtonTitle>
+                        <span>
+                            {value ? value.label : 'CHOOSE YOUR CRUSH'}
+                            <span className={isOpen ? "icon-arrow-up" : "icon-arrow-down"}/>
+                        </span>
+                    </ButtonTitle>
                 </div>
             }
         >

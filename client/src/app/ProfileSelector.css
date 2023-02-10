@@ -9,7 +9,20 @@
 .profile-selector-target {
     display: flex;
     flex-direction: row;
+    gap: 12px;
     cursor: pointer;
+    align-items: center;
+}
+
+.profile-avatar-container {
+    height: 56px;
+}
+
+.profile-avatar {
+    height: 64px;
+    width: 64px;
+    background: white;
+    clip-path: path('M4.82424 28.1283L32 55.3143L59.1758 28.1283C65.6081 21.6936 65.6081 11.2608 59.1758 4.82606C52.7434 -1.60868 42.3146 -1.60868 35.8822 4.82606L32 8.70977L28.1177 4.82605C21.6854 -1.60869 11.2566 -1.60868 4.82424 4.82606C-1.60808 11.2608 -1.60808 21.6936 4.82424 28.1283Z');
 }
 
 .profile-selector-menu {
