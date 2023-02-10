@@ -67,6 +67,7 @@
     flex-direction: column;
     flex-grow: 0;
     flex-shrink: 0;
+    padding: 0 16px;
 }
 
 .root-page_two-column .incoming-valentines-column,
@@ -134,5 +135,13 @@
     .root-page_two-column .send-valentine-column {
         align-self: center;
         position: static;
+    }
+
+    .incoming-valentines-row {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
     }
 }

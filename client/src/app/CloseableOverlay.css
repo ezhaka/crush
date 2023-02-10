@@ -29,3 +29,14 @@
 .icon-close:hover {
     opacity: 0.5;
 }
+
+@media screen and (max-width: 960px) {
+    .closeable-overlay-limited-container {
+        padding: 16px 0;
+    }
+
+    .icon-close {
+        top: 16px;
+        right: 16px;
+    }
+}

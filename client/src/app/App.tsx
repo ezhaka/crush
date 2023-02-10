@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {createContext, useCallback, useEffect, useRef, useState} from "react";
+import {createContext, useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
 import {fetchSpaceUserToken, UserTokenData} from "../UserTokenData";
 import {SendValentineForm} from './SendValentineForm';
 import {httpGet} from "../api/http";
@@ -28,6 +28,10 @@ export const PageContext = createContext<((page: Page) => void) | undefined>(und
 function App() {
     const [page, setPage] = useState<Page>({kind: "root"})
     const [token, setToken] = useState<UserTokenData>()
+
+    useLayoutEffect(() => {
+        window.scroll(0, 0)
+    }, [page])
 
     useEffect(() => {
         const fetch = async () => {
