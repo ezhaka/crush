@@ -1,12 +1,8 @@
 package org.homepage
 
 import org.homepage.db.AppInstallationTable
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.count
-import org.jetbrains.exposed.sql.replace
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import space.jetbrains.api.runtime.SpaceAppInstance
 import space.jetbrains.api.runtime.helpers.SpaceAppInstanceStorage
 
@@ -23,6 +19,10 @@ object AppInstanceStorage : SpaceAppInstanceStorage {
                 }
                 .firstOrNull()
         }
+    }
+
+    override suspend fun removeAppInstance(clientId: String) {
+        AppInstallationTable.deleteWhere { AppInstallationTable.clientId eq clientId }
     }
 
     override suspend fun saveAppInstance(appInstance: SpaceAppInstance): Unit = transaction {

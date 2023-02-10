@@ -21,16 +21,3 @@ export async function fetchSpaceUserToken(askForConsent: boolean = false, permis
         }, "*", [channel.port2]);
     }) as UserTokenData
 }
-
-export const permissionScope = "global:Profile.View"
-
-export function approvePermissionRequest() {
-    return new Promise(resolve => {
-        const channel = new MessageChannel();
-        channel.port1.onmessage = e => resolve(e.data);
-        window.parent.postMessage({
-            type: "ApprovePermissionsRequest",
-            permissionScope: permissionScope,
-        }, "*", [channel.port2]);
-    })
-}

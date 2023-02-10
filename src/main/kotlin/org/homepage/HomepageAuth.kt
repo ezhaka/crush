@@ -1,6 +1,6 @@
 package org.homepage
 
-import com.nimbusds.jwt.JWTParser
+import io.ktor.client.*
 import io.ktor.http.*
 import io.ktor.http.auth.*
 import io.ktor.server.application.*
@@ -10,12 +10,16 @@ import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import space.jetbrains.api.runtime.Space
 import space.jetbrains.api.runtime.SpaceAppInstance
 import space.jetbrains.api.runtime.SpaceAuth
 import space.jetbrains.api.runtime.SpaceClient
+import space.jetbrains.api.runtime.helpers.parseAndVerifyAccessToken
 
-suspend fun PipelineContext<Unit, ApplicationCall>.runAuthorized(handler: suspend (SpaceTokenInfo) -> Unit) {
-    getSpaceTokenInfo()?.let { spaceTokenInfo ->
+suspend fun PipelineContext<Unit, ApplicationCall>.runAuthorized(
+    handler: suspend (SpaceTokenInfo) -> Unit
+) {
+    getSpaceTokenInfo(spaceHttpClient)?.let { spaceTokenInfo ->
         try {
             handler(spaceTokenInfo)
         } catch (e: Exception) {
@@ -27,21 +31,23 @@ suspend fun PipelineContext<Unit, ApplicationCall>.runAuthorized(handler: suspen
     }
 }
 
-private suspend fun PipelineContext<Unit, ApplicationCall>.getSpaceTokenInfo(): SpaceTokenInfo? {
-    return getSpaceTokenInfo(context.request)
+private suspend fun PipelineContext<Unit, ApplicationCall>.getSpaceTokenInfo(ktorClient: HttpClient): SpaceTokenInfo? {
+    return getSpaceTokenInfo(context.request, ktorClient)
 }
 
-suspend fun getSpaceTokenInfo(request: ApplicationRequest): SpaceTokenInfo? {
+suspend fun getSpaceTokenInfo(request: ApplicationRequest, ktorClient: HttpClient): SpaceTokenInfo? {
     return (request.parseAuthorizationHeader() as? HttpAuthHeader.Single)?.blob
-        ?.let { getSpaceTokenInfo(it) }
+        ?.let { getSpaceTokenInfo(it, ktorClient) }
 }
 
-suspend fun getSpaceTokenInfo(spaceUserToken: String): SpaceTokenInfo? {
-    val jwtClaimsSet = JWTParser.parse(spaceUserToken).jwtClaimsSet
-    val spaceAppInstance =
-        jwtClaimsSet.audience.singleOrNull()?.let { AppInstanceStorage.loadAppInstance(it) } ?: return null
-    val spaceUserId = jwtClaimsSet.subject
-    return SpaceTokenInfo(spaceAppInstance, spaceUserId, spaceUserToken)
+suspend fun getSpaceTokenInfo(spaceUserToken: String, ktorClient: HttpClient): SpaceTokenInfo? {
+    return Space.parseAndVerifyAccessToken(spaceUserToken, ktorClient, AppInstanceStorage)?.let {
+        SpaceTokenInfo(
+            spaceAppInstance = it.spaceAppInstance,
+            spaceUserId = it.spaceUserId,
+            spaceAccessToken = it.spaceAccessToken,
+        )
+    }
 }
 
 data class SpaceGlobalUserId(

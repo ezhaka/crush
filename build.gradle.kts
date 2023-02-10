@@ -34,6 +34,7 @@ node {
 
 repositories {
     mavenCentral()
+    maven("https://packages.jetbrains.team/maven/p/crush/maven")
     maven("https://maven.pkg.jetbrains.space/public/p/space/maven")
 }
 

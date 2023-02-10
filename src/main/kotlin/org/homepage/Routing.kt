@@ -1,6 +1,9 @@
 package org.homepage
 
 import Routes
+import io.ktor.client.plugins.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -12,7 +15,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
-import io.ktor.websocket.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.channels.SendChannel
 import org.homepage.actors.MainActorMsg
 import org.homepage.actors.ValentineMod
@@ -29,10 +32,7 @@ import space.jetbrains.api.runtime.helpers.SpaceHttpResponse
 import space.jetbrains.api.runtime.helpers.processPayload
 import space.jetbrains.api.runtime.resources.applications
 import space.jetbrains.api.runtime.resources.teamDirectory
-import space.jetbrains.api.runtime.types.ApplicationIdentifier
-import space.jetbrains.api.runtime.types.GlobalPermissionContextIdentifier
-import space.jetbrains.api.runtime.types.InitPayload
-import space.jetbrains.api.runtime.types.ProfileIdentifier
+import space.jetbrains.api.runtime.types.*
 
 fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
     val log = LoggerFactory.getLogger("Routing.kt")
@@ -50,7 +50,7 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                         clientWithClientCredentials().applications.authorizations.authorizedRights.requestRights(
                             application = ApplicationIdentifier.Me,
                             contextIdentifier = GlobalPermissionContextIdentifier,
-                            rightCodes = listOf("Profile.View")
+                            rightCodes = listOf(PermissionIdentifier.ViewMemberProfiles)
                         )
 
                         setUiExtensions()
@@ -144,7 +144,7 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                 return@webSocket
             }
 
-            val token = getSpaceTokenInfo(rawToken)
+            val token = getSpaceTokenInfo(rawToken, spaceHttpClient)
             if (token == null) {
                 call.respond(HttpStatusCode.Unauthorized, "Token is not found or invalid")
                 return@webSocket
