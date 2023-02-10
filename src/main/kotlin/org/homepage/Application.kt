@@ -15,13 +15,14 @@ import space.jetbrains.api.runtime.ktorClientForSpace
 
 @Suppress("unused")
 fun Application.module() {
-    val mainActor = mainActor()
 
     install(WebSockets) {
         contentConverter = KotlinxWebsocketSerializationConverter(Json)
     }
 
     initDbConnection()
+
+    val mainActor = mainActor()
 
     configureRouting(mainActor)
 

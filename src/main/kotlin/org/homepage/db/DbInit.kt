@@ -11,8 +11,6 @@ fun initDbConnection() {
     val postgresUrl = config.tryGetString("storage.postgres.url")?.let { Url(it) }
         ?: throw IllegalArgumentException("storage.postgres.url configuration parameter not set or invalid")
 
-    println("postgresUrl = $postgresUrl")
-
     val connection = Database.connect(
         url = URLBuilder(postgresUrl).apply {
             protocol = URLProtocol("jdbc:postgresql", 5432)

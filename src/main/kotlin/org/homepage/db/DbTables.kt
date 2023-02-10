@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.Table
 object AppInstallationTable : Table("app_installation") {
     val clientId = varchar("client_id", 36).index(isUnique = true)
     val clientSecret = varchar("client_secret", 64)
-    val serverUrl = varchar("server_url", 256).index()
+    val serverUrl = varchar("server_url", 256).index(isUnique = true)
 
     override val primaryKey = PrimaryKey(clientId)
 }
