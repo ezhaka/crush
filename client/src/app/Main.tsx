@@ -5,7 +5,7 @@ import {valentineTypes} from "./ValentineType";
 
 function createPreloadLink(href: string, as: string = "image") {
     const link = document.createElement("link")
-    link.rel = "preload"
+    link.rel = "prefetch"
     link.as = as
     link.href = href
     document.head.appendChild(link)
