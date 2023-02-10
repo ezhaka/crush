@@ -3,7 +3,7 @@ package org.homepage.db
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Table
 
-object AppInstallationTable : Table("app_installation") {
+object AppInstallationTable : Table("app_installation2") {
     val clientId = varchar("client_id", 36).index(isUnique = true)
     val clientSecret = varchar("client_secret", 64)
     val serverUrl = varchar("server_url", 256).index(isUnique = true)
