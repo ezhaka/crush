@@ -7,8 +7,14 @@
     height: 620px;
 }
 
-.valentine-editor textarea {
+.valentine-editor .textarea-container {
     position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.valentine-editor textarea {
     border: none;
     background-color: transparent;
     resize: none;
@@ -16,6 +22,7 @@
     font-family: "Unbounded", sans-serif;
     font-size: 20px;
     line-height: 28px;
+    min-height: 28px;
     font-weight: 400;
     text-align: center;
 
