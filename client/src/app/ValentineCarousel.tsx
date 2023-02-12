@@ -25,14 +25,18 @@ export const ValentineCarousel = ({slidesCount, activeSlide, setActiveSlide, inf
         const listener = (e: KeyboardEvent) => {
             if (e.key === 'Right' || e.key === 'ArrowRight') {
                 const nextSlide = activeSlide + 1;
-                if (nextSlide < slidesCount) {
+                if (infinite) {
+                    setActiveSlide(nextSlide % slidesCount)
+                } else if (nextSlide < slidesCount) {
                     setActiveSlide(nextSlide)
                 }
             }
 
             if (e.key === 'Left' || e.key === 'ArrowLeft') {
                 const prevSlide = activeSlide - 1;
-                if (prevSlide >= 0) {
+                if (infinite) {
+                    setActiveSlide(prevSlide < 0 ? (slidesCount - 1) : prevSlide)
+                } else if (prevSlide >= 0) {
                     setActiveSlide(prevSlide)
                 }
             }
@@ -43,7 +47,7 @@ export const ValentineCarousel = ({slidesCount, activeSlide, setActiveSlide, inf
         return () => {
             document.removeEventListener('keydown', listener)
         }
-    }, [slidesCount, activeSlide, setActiveSlide])
+    }, [slidesCount, activeSlide, setActiveSlide, infinite])
 
     return <div className="carousel-container hidden-scrollbar">
         <Carousel
