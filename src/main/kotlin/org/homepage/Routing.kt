@@ -5,11 +5,13 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.http.CacheControl
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.locations.*
 import io.ktor.server.locations.put
+import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -33,6 +35,7 @@ import space.jetbrains.api.runtime.helpers.processPayload
 import space.jetbrains.api.runtime.resources.applications
 import space.jetbrains.api.runtime.resources.teamDirectory
 import space.jetbrains.api.runtime.types.*
+import java.time.ZonedDateTime
 
 fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
     val log = LoggerFactory.getLogger("Routing.kt")
@@ -65,10 +68,20 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
             }
         }
 
-        static("/") {
+        resource(remotePath = "/", resource = "index.html", resourcePackage = "static")
+
+        static("/static") {
+            install(CachingHeaders) {
+                options { _, _ ->
+                    CachingOptions(
+                        CacheControl.MaxAge(maxAgeSeconds = 604800),
+                        ZonedDateTime.now().plusDays(30)
+                    )
+                }
+            }
+
             staticBasePackage = "static"
             resources(".")
-            defaultResource("index.html")
         }
 
         get("/health") {

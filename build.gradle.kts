@@ -43,6 +43,7 @@ dependencies {
     implementation("io.ktor:ktor-server-jetty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-locations-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-websockets:$ktorVersion")
+    implementation("io.ktor:ktor-server-caching-headers:$ktorVersion")
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
