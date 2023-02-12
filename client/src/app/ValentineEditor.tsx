@@ -45,6 +45,12 @@ export const ValentineEditor = ({type, message, setMessage}: Props) => {
                         if (e.key === 'Right' || e.key === 'ArrowRight' || e.key === 'Left' || e.key === 'ArrowLeft') {
                             e.stopPropagation()
                         }
+
+                        // To prevent closing edit form right away
+                        if (e.key === 'Esc' || e.key === 'Escape') {
+                            e.stopPropagation()
+                            e.currentTarget.blur()
+                        }
                     }}
                     style={{
                         color: type.textColor,

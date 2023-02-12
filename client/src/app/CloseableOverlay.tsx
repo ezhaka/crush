@@ -1,5 +1,5 @@
 import * as React from "react";
-import {ReactNode, useContext} from "react";
+import {ReactNode, useContext, useEffect} from "react";
 import {PageContext} from "./App";
 import "./CloseableOverlay.css"
 import "./RootPage.css"
@@ -11,6 +11,20 @@ type Props = {
 
 export const CloseableOverlay = ({children}: Props) => {
     const setPage = useContext(PageContext)
+
+    useEffect(() => {
+        const listener = (e: KeyboardEvent) => {
+            if (e.key === 'Esc' || e.key === 'Escape') {
+                setPage({kind: "root"})
+            }
+        }
+
+        document.addEventListener('keydown', listener)
+
+        return () => {
+            document.removeEventListener('keydown', listener)
+        }
+    }, [])
 
     return (<div className="closeable-overlay">
         <div className="noise"/>
