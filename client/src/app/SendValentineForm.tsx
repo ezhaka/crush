@@ -80,6 +80,8 @@ export const SendValentineForm = ({token}: Props) => {
                 </ValentineCarousel>
 
                 <Button title="SEND IT!" action={submit}/>
+
+                <div className="promo-text">It’s absolutely confidential. Your feelings will reach your crush without revealing your identity. We will not store this information anywhere.</div>
             </div>}
 
             {postingState === 'posting_too_long' && <div className="valentine-is-sent">

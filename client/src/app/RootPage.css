@@ -61,6 +61,10 @@
     top: 16px;
 }
 
+.send-valentine-column .promo-text {
+    color: #44000C;
+}
+
 .incoming-valentines-column,
 .send-valentine-column {
     display: flex;
