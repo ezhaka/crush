@@ -10,7 +10,7 @@ import {valentineTypes} from "./ValentineType";
 import {ValentineEditor} from "./ValentineEditor";
 import {CloseableOverlay} from "./CloseableOverlay";
 import {PageContext} from "./App";
-import { ValentineCarousel } from "./ValentineCarousel";
+import {ValentineCarousel} from "./ValentineCarousel";
 
 type Props = {
     token: UserTokenData;
@@ -68,7 +68,12 @@ export const SendValentineForm = ({token}: Props) => {
                     <ProfileSelector value={profile} onChange={setProfile} token={token}/>
                 </div>
 
-                <ValentineCarousel activeSlide={activeSlide} setActiveSlide={setActiveSlide}>
+                <ValentineCarousel
+                    infinite={true}
+                    slidesCount={valentineTypes.length}
+                    activeSlide={activeSlide}
+                    setActiveSlide={setActiveSlide}
+                >
                     {valentineTypes.map((item, index) => (
                         <ValentineEditor key={index} message={message} setMessage={setMessage} type={item}/>
                     ))}

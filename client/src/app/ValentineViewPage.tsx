@@ -10,21 +10,38 @@ import {ValentineCarousel} from "./ValentineCarousel";
 
 type Props = {
     valentines: Valentine[];
-    valentine: Valentine;
+    initialValentine: Valentine;
     token: UserTokenData;
 }
 
-export const ValentineViewPage = ({valentines, valentine, token}: Props) => {
+export const ValentineViewPage = ({valentines, initialValentine, token}: Props) => {
     const index = useMemo(() => {
-        return valentines.findIndex(v => v.id == valentine.id)
-    }, [valentine.id, valentines])
+        return valentines.findIndex(v => v.id == initialValentine.id)
+    }, [initialValentine.id, valentines])
 
     const [activeSlide, setActiveSlide] = useState(index);
+
+    const currentValentine = useMemo(() => valentines[activeSlide], [valentines, activeSlide])
+
+    useEffect(() => {
+        const fetch = async () => {
+            if (token && !currentValentine.read) {
+                await httpPut(`/api/read-valentine?valentineId=${currentValentine.id}`, token.token, {})
+            }
+        }
+
+        fetch().catch(console.error)
+    }, [currentValentine.id, currentValentine.read, token])
 
     return (
         <CloseableOverlay>
             <div className="valentine-view-page">
-                <ValentineCarousel activeSlide={activeSlide} setActiveSlide={setActiveSlide}>
+                <ValentineCarousel
+                    infinite={false}
+                    slidesCount={valentines.length}
+                    activeSlide={activeSlide}
+                    setActiveSlide={setActiveSlide}
+                >
                     {valentines.map(v => <ValentineView valentine={v} token={token}/>)}
                 </ValentineCarousel>
             </div>
@@ -35,16 +52,6 @@ export const ValentineViewPage = ({valentines, valentine, token}: Props) => {
 const ValentineView = ({valentine, token}: { valentine: Valentine, token: UserTokenData }) => {
     const type = valentineTypes[valentine.type]
     const src = require(`./../../resources/valentines/${type.name}-fullscreen.png`)
-
-    useEffect(() => {
-        const fetch = async () => {
-            if (token) {
-                await httpPut(`/api/read-valentine?valentineId=${valentine.id}`, token.token, {})
-            }
-        }
-
-        fetch().catch(console.error)
-    }, [valentine.id, token])
 
     return (
         <div className="valentine-view">

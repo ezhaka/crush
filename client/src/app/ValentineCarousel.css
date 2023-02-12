@@ -4,7 +4,13 @@
     max-width: 100%;
 }
 
+.carousel-container button[disabled] .carousel-arrow {
+    visibility: hidden;
+    cursor: auto;
+}
+
 .carousel-arrow {
+    cursor: pointer;
     font-size: 48px;
     color: #FFFFFF;
     opacity: 0.3;

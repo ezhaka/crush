@@ -91,7 +91,7 @@ function App() {
                     {page.kind == "root" && <RootPage valentines={valentines} token={token}/>}
                     {page.kind == "sendForm" && token && <SendValentineForm token={token}/>}
                     {page.kind == "valentine" &&
-                        <ValentineViewPage valentine={page.valentine} valentines={valentines} token={token}/>}
+                        <ValentineViewPage initialValentine={page.valentine} valentines={valentines} token={token}/>}
                 </div>
             </PageContext.Provider>
         </>

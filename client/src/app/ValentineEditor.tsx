@@ -40,6 +40,12 @@ export const ValentineEditor = ({type, message, setMessage}: Props) => {
                     onChange={(e) =>
                         setMessage(e.target.value.slice(0, limit).replace('\n', ''))
                     }
+                    onKeyDown={(e) => {
+                        // To prevent carousel from spinning
+                        if (e.key === 'Right' || e.key === 'ArrowRight' || e.key === 'Left' || e.key === 'ArrowLeft') {
+                            e.stopPropagation()
+                        }
+                    }}
                     style={{
                         color: type.textColor,
                         width: type.width + 'px',
