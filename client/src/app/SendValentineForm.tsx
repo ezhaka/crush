@@ -16,38 +16,54 @@ type Props = {
     token: UserTokenData;
 }
 
+type PostingState = 'posting' | 'posting_too_long' | 'posted' | 'error'
+
 export const SendValentineForm = ({token}: Props) => {
+    const setPage = useContext(PageContext)
     const [profile, setProfile] = useState<ProfileSelectItem>()
     const [message, setMessage] = useState<string>('')
-    const [posted, setPosted] = useState<boolean>(false)
+    const [postingState, setPostingState] = useState<PostingState>(undefined)
     const [shakeEmpty, setShakeEmpty] = useState<boolean>(false)
     const [activeSlide, setActiveSlide] = useState(0);
 
     const submit = () => {
+        if (!!postingState) {
+            return
+        }
+
         if (!profile) {
             if (!shakeEmpty) {
                 setShakeEmpty(true)
                 setTimeout(() => setShakeEmpty(false), 1000)
             }
         } else {
+            setPostingState('posting')
+
+            const timer = setTimeout(() => setPostingState('posting_too_long'), 1000)
+
             httpPost(`/api/send-valentine`, token.token, {
                 receiverId: profile?.id,
                 messageText: message,
                 cardType: activeSlide
             })
                 .then((response) => {
+                    clearTimeout(timer)
                     if (response.ok) {
-                        setPosted(true)
+                        setPostingState('posted')
                     } else {
-                        // TODO: show error toast
+                        setPostingState('error')
                     }
+                })
+                .catch(() => {
+                    clearTimeout(timer)
+                    setPostingState('error')
                 })
         }
     }
 
     return (
         <CloseableOverlay>
-            {!posted && <div className="send-valentine-form">
+            {(!postingState || postingState === 'posting') && <div className="send-valentine-form">
                 <div className={shakeEmpty && 'shake-empty-dropdown'}>
                     <ProfileSelector value={profile} onChange={setProfile} token={token}/>
                 </div>
@@ -61,7 +77,22 @@ export const SendValentineForm = ({token}: Props) => {
                 <Button title="SEND IT!" action={submit}/>
             </div>}
 
-            {posted && <ValentineIsSent/>}
+            {postingState === 'posting_too_long' && <div className="valentine-is-sent">
+                <div className="logo"/>
+                <div className="promo-header">Sending Love...</div>
+                <div className="promo-text">But It's Taking A Bit Longer Than Expected</div>
+            </div>}
+
+            {postingState === 'posted' && <ValentineIsSent/>}
+
+            {postingState === 'error' && <div className="valentine-is-sent">
+                <div className="logo"/>
+                <div className="promo-header">Oops!</div>
+                <div className="promo-text">Love Delivery Failed. Please Try Again Later.</div>
+                <Button title="OKAY" action={() => {
+                    setPage({kind: "root"})
+                }}/>
+            </div>}
         </CloseableOverlay>
     )
 }
