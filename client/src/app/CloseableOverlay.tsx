@@ -27,7 +27,6 @@ export const CloseableOverlay = ({children}: Props) => {
     }, [])
 
     return (<div className="closeable-overlay">
-        <div className="noise"/>
         <div className="closeable-overlay-limited-container">
             <a
                 href="#"

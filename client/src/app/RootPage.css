@@ -39,10 +39,6 @@
 
 .logo {
     flex-shrink: 0;
-    margin-bottom: 110px;
-}
-
-.root-page_two-column .logo {
     margin-bottom: 36px;
 }
 
@@ -81,6 +77,7 @@
     width: 50%;
 }
 
+.root-page .promo-header,
 .root-page_two-column .send-valentine-column .promo-header {
     color: #A0001D;
 }
@@ -149,5 +146,9 @@
         align-items: center;
         justify-content: center;
         gap: 0;
+    }
+
+    .send-valentine-column {
+        align-self: center;
     }
 }

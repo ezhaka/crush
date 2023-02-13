@@ -81,11 +81,12 @@ export const SendValentineForm = ({token}: Props) => {
 
                 <Button title="SEND IT!" action={submit}/>
 
-                <div className="promo-text">It’s absolutely confidential. Your feelings will reach your crush without revealing your identity. We will not store this information anywhere.</div>
+                <div className="promo-text">It’s absolutely confidential. Your feelings will reach your crush without
+                    revealing your identity. We will not store this information anywhere.
+                </div>
             </div>}
 
             {postingState === 'posting_too_long' && <div className="valentine-is-sent">
-                <div className="logo"/>
                 <div className="promo-header">Sending Love...</div>
                 <div className="promo-text">But It's Taking A Bit Longer Than Expected</div>
             </div>}
@@ -93,7 +94,6 @@ export const SendValentineForm = ({token}: Props) => {
             {postingState === 'posted' && <ValentineIsSent/>}
 
             {postingState === 'error' && <div className="valentine-is-sent">
-                <div className="logo"/>
                 <div className="promo-header">Oops!</div>
                 <div className="promo-text">Love Delivery Failed. Please Try Again Later.</div>
                 <Button title="OKAY" action={() => {
@@ -110,7 +110,6 @@ const ValentineIsSent = () => {
     const setPage = useContext(PageContext)
 
     return (<div className="valentine-is-sent">
-        <div className="logo"/>
         <div className="promo-header">Your Secret Valentine Has Been Sent!</div>
         <div className="promo-text">
             It will be delivered anonymously to your crush. We hope that this Valentine's Day will be filled with joy
