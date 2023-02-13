@@ -24,7 +24,7 @@ class ConnectionActor(
 
 fun CoroutineScope.connectionActor(ctx: MainActorMsg.ConnectionOpened) = ConnectionActor(
     ctx.session,
-    actor<ValentineMod>(capacity = 1024) {
+    actor<ValentineMod>(capacity = 16) {
         try {
             val valentines = transaction {
                 IncomingValentineTable

@@ -170,6 +170,8 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                     "mainActor inbox"
                 )
 
+                log.info("Someone has sent a valentine to someone")
+
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -227,6 +229,8 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                         log,
                         "mainActor inbox"
                     )
+
+                    log.info("Someone has read their valentine")
 
                     call.respond(HttpStatusCode.OK)
                 } else {

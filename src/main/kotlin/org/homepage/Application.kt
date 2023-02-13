@@ -8,10 +8,13 @@ import io.ktor.server.websocket.*
 import kotlinx.serialization.json.Json
 import org.homepage.actors.mainActor
 import org.homepage.db.initDbConnection
+import org.slf4j.LoggerFactory
 import space.jetbrains.api.runtime.Space
 import space.jetbrains.api.runtime.SpaceAuthFlow
 import space.jetbrains.api.runtime.appInstallUrl
 import space.jetbrains.api.runtime.ktorClientForSpace
+
+private val log = LoggerFactory.getLogger("Application.kt")
 
 @Suppress("unused")
 fun Application.module() {
@@ -26,7 +29,7 @@ fun Application.module() {
 
     configureRouting(mainActor)
 
-    println(
+    log.info(
         "Public install url ${
             Space.appInstallUrl(
                 spaceServerUrl = "https://spacerschoice.jetbrains.space/",
@@ -39,7 +42,7 @@ fun Application.module() {
             )
         }")
 
-    println(
+    log.info(
         "Internal install url ${
             Space.appInstallUrl(
                 spaceServerUrl = "http://localhost:8000/",
