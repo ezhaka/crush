@@ -36,14 +36,19 @@ export const ValentineViewPage = ({valentines, initialValentine, token}: Props) 
     return (
         <CloseableOverlay>
             <div className="valentine-view-page">
-                <ValentineCarousel
+
+                {valentines.length === 1 && <div className="carousel-container hidden-scrollbar">
+                    <ValentineView valentine={valentines[0]} token={token}/>
+                </div> }
+
+                {valentines.length > 1 && <ValentineCarousel
                     infinite={false}
                     slidesCount={valentines.length}
                     activeSlide={activeSlide}
                     setActiveSlide={setActiveSlide}
                 >
                     {valentines.map(v => <ValentineView valentine={v} token={token}/>)}
-                </ValentineCarousel>
+                </ValentineCarousel>}
             </div>
         </CloseableOverlay>
     )
