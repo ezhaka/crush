@@ -1,15 +1,17 @@
 import * as React from "react";
 import {ValentineType} from "./ValentineType";
 import "./ValentineEditor.css"
+import "./Common.css"
 import {useEffect, useLayoutEffect, useRef} from "react";
 
 type Props = {
     type: ValentineType;
     message: string;
     setMessage: (message: string) => void;
+    shakeMessage: boolean;
 }
 
-export const ValentineEditor = ({type, message, setMessage}: Props) => {
+export const ValentineEditor = ({type, message, setMessage, shakeMessage}: Props) => {
     const src = require(`./../../resources/valentines/${type.name}-fullscreen.png`)
     const limit = 100
     const textareaRef = useRef<HTMLTextAreaElement>()
@@ -57,6 +59,7 @@ export const ValentineEditor = ({type, message, setMessage}: Props) => {
                         width: type.width + 'px',
                         maxHeight: type.height + 'px',
                     }}
+                    className={shakeMessage && 'shake-empty'}
                 />
             </div>
         </div>

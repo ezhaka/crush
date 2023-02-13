@@ -23,7 +23,8 @@ export const SendValentineForm = ({token}: Props) => {
     const [profile, setProfile] = useState<ProfileSelectItem>()
     const [message, setMessage] = useState<string>('')
     const [postingState, setPostingState] = useState<PostingState>(undefined)
-    const [shakeEmpty, setShakeEmpty] = useState<boolean>(false)
+    const [shakeEmptyProfile, setShakeEmptyProfile] = useState<boolean>(false)
+    const [shakeEmptyMessage, setShakeEmptyMessage] = useState<boolean>(false)
     const [activeSlide, setActiveSlide] = useState(0);
 
     const submit = () => {
@@ -32,9 +33,14 @@ export const SendValentineForm = ({token}: Props) => {
         }
 
         if (!profile) {
-            if (!shakeEmpty) {
-                setShakeEmpty(true)
-                setTimeout(() => setShakeEmpty(false), 1000)
+            if (!shakeEmptyProfile) {
+                setShakeEmptyProfile(true)
+                setTimeout(() => setShakeEmptyProfile(false), 1000)
+            }
+        } else if (!message) {
+            if (!shakeEmptyMessage) {
+                setShakeEmptyMessage(true)
+                setTimeout(() => setShakeEmptyMessage(false), 1000)
             }
         } else {
             setPostingState('posting')
@@ -64,7 +70,7 @@ export const SendValentineForm = ({token}: Props) => {
     return (
         <CloseableOverlay>
             {(!postingState || postingState === 'posting') && <div className="send-valentine-form">
-                <div className={shakeEmpty && 'shake-empty-dropdown'}>
+                <div className={shakeEmptyProfile && 'shake-empty'}>
                     <ProfileSelector value={profile} onChange={setProfile} token={token}/>
                 </div>
 
@@ -75,7 +81,13 @@ export const SendValentineForm = ({token}: Props) => {
                     setActiveSlide={setActiveSlide}
                 >
                     {valentineTypes.map((item, index) => (
-                        <ValentineEditor key={index} message={message} setMessage={setMessage} type={item}/>
+                        <ValentineEditor
+                            key={index}
+                            message={message}
+                            setMessage={setMessage}
+                            type={item}
+                            shakeMessage={activeSlide === index && shakeEmptyMessage}
+                        />
                     ))}
                 </ValentineCarousel>
 
