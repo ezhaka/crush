@@ -67,7 +67,7 @@ const ValentineView = ({valentine, token}: { valentine: Valentine, token: UserTo
                 left: type.left + 'px',
                 width: type.width + 'px',
                 height: type.height + 'px',
-            }}>
+            }} onMouseDown={(e) => e.stopPropagation()}>
                 {valentine.message}
             </div>
         </div>
