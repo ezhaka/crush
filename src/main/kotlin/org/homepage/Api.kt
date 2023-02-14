@@ -18,6 +18,8 @@ sealed class WebsocketMessage {
     class ValentineReceived(val valentine: IncomingValentine) : WebsocketMessage()
     @Serializable
     class ValentineRead(val valentineId: Long) : WebsocketMessage()
+    @Serializable
+    class Pong() : WebsocketMessage()
 }
 @Serializable
 class Profile(

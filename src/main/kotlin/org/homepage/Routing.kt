@@ -203,6 +203,10 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                 )
 
                 for (frame in incoming) {
+                    if (token.spaceUserId == myUserId) {
+                        log.info("Anton Sukhonosenko's ping received")
+                    }
+                    sendSerialized<WebsocketMessage>(WebsocketMessage.Pong())
                 }
             } finally {
                 if (token.spaceUserId == myUserId) {

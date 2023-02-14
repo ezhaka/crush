@@ -1,8 +1,7 @@
 import * as React from 'react';
-import {createContext, useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
+import {createContext, useEffect, useLayoutEffect, useRef, useState} from "react";
 import {fetchSpaceUserToken, UserTokenData} from "../UserTokenData";
 import {SendValentineForm} from './SendValentineForm';
-import {httpGet} from "../api/http";
 import {ValentineViewPage} from "./ValentineViewPage";
 import "./App.css"
 import {RootPage} from './RootPage';
@@ -46,14 +45,20 @@ function App() {
 
     useEffect(() => {
         let webSocket: ReconnectingWebSocket | undefined
+        let interval: NodeJS.Timer | undefined
 
         if (token) {
             const protocol = window.location.hostname === 'localhost' ? 'ws' : 'wss'
             webSocket = new ReconnectingWebSocket(`${protocol}://${window.location.host}/api/websocket?token=${token.token}`);
             setWs(webSocket)
+
+            interval = setInterval(() => {
+                webSocket.send(JSON.stringify({type: "ping"}))
+            }, 1000)
         }
 
         return () => {
+            clearInterval(interval)
             webSocket?.close()
         }
     }, [token])
