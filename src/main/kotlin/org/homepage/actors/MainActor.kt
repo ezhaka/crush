@@ -28,13 +28,16 @@ sealed class MainActorMsg {
 fun CoroutineScope.mainActor() = actor<MainActorMsg>(capacity = 4096) {
     supervisorScope {
         val counterUpdateActor = counterUpdateActor()
-        val userToConnections = mutableMapOf<SpaceGlobalUserId, List<ConnectionActor>>()
+        val userToConnections = mutableMapOf<SpaceGlobalUserId, MutableList<ConnectionActor>>()
 
         for (msg in channel) {
             when (msg) {
                 is MainActorMsg.ConnectionOpened -> {
-                    userToConnections[msg.userId] =
-                        (userToConnections[msg.userId] ?: emptyList()) + connectionActor(msg)
+                    val userConnections = userToConnections.getOrPut(msg.userId) {
+                        mutableListOf()
+                    }
+
+                    userConnections.add(connectionActor(msg))
                 }
 
                 is MainActorMsg.Modification -> {
@@ -46,8 +49,13 @@ fun CoroutineScope.mainActor() = actor<MainActorMsg>(capacity = 4096) {
                 }
 
                 is MainActorMsg.ConnectionClosed -> {
-                    userToConnections[msg.userId] =
-                        userToConnections[msg.userId]?.filter { it.session != msg.session } ?: emptyList()
+                    val connectionActor = userToConnections[msg.userId]
+                        ?.firstOrNull { it.session != msg.session }
+
+                    connectionActor?.let {
+                        userToConnections[msg.userId]?.remove(connectionActor)
+                        connectionActor.inbox.close()
+                    }
                 }
             }
         }

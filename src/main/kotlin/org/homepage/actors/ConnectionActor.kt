@@ -2,6 +2,7 @@ package org.homepage.actors
 
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
@@ -54,6 +55,8 @@ fun CoroutineScope.connectionActor(ctx: MainActorMsg.ConnectionOpened) = Connect
                     }
                 }
             }
+        } catch (e: CancellationException) {
+            log.info("Cancellation exception has happened in the connection actor")
         } catch (e: Exception) {
             log.error("An exception occurred in the connection actor", e)
             ctx.session.close(CloseReason(CloseReason.Codes.INTERNAL_ERROR, "Something went wrong"))
