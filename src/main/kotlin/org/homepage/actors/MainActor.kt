@@ -2,6 +2,7 @@ package org.homepage.actors
 
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.supervisorScope
@@ -24,7 +25,7 @@ sealed class MainActorMsg {
     class Modification(val mod: ValentineMod) : MainActorMsg()
 }
 
-fun CoroutineScope.mainActor() = actor<MainActorMsg> {
+fun CoroutineScope.mainActor() = actor<MainActorMsg>(capacity = 4096) {
     supervisorScope {
         val counterUpdateActor = counterUpdateActor()
         val userToConnections = mutableMapOf<SpaceGlobalUserId, List<ConnectionActor>>()
