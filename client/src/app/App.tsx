@@ -34,12 +34,11 @@ function App() {
     }, [page])
 
     useEffect(() => {
-        const fetch = async () => {
-            const token = await fetchSpaceUserToken()
-            setToken(token)
-        }
+        setInterval(() => {
+            fetchSpaceUserToken().then(t => setToken(t)).catch(console.error)
+        }, 1000 * 60 * 4)
 
-        fetch().catch(console.error)
+        fetchSpaceUserToken().then(t => setToken(t)).catch(console.error)
     }, [])
 
     const [valentines, setValentines] = useState<Valentine[] | undefined>(undefined)
