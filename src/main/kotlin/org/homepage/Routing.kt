@@ -21,6 +21,7 @@ import io.ktor.utils.io.*
 import kotlinx.coroutines.channels.SendChannel
 import org.homepage.actors.MainActorMsg
 import org.homepage.actors.ValentineMod
+import org.homepage.actors.myUserId
 import org.homepage.actors.trySendWithLogging
 import org.homepage.db.IncomingValentineTable
 import org.jetbrains.exposed.sql.*
@@ -204,6 +205,10 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                 for (frame in incoming) {
                 }
             } finally {
+                if (token.spaceUserId == myUserId) {
+                    log.info("Anton Sukhonosenko's websocket connection finished")
+                }
+
                 mainActor.trySendWithLogging(
                     MainActorMsg.ConnectionClosed(token.globalUserId(), this),
                     log,

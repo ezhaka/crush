@@ -50,29 +50,39 @@ fun CoroutineScope.connectionActor(ctx: MainActorMsg.ConnectionOpened, parent: C
             for (event in channel) {
                 when (event) {
                     is ValentineMod.Created -> {
+                        logForMeOnly(ctx, "Anton Sukhonosenko's got Created event")
                         ctx.session.sendSerialized<WebsocketMessage>(WebsocketMessage.ValentineReceived(event.valentine))
                     }
 
                     is ValentineMod.Read -> {
+                        logForMeOnly(ctx, "Anton Sukhonosenko's got Read event")
                         ctx.session.sendSerialized<WebsocketMessage>(WebsocketMessage.ValentineRead(event.id))
                     }
                 }
             }
         } catch (e: CancellationException) {
             log.info("Cancellation exception has happened in the connection actor")
+            logForMeOnly(ctx, "Anton Sukhonosenko's caught cancellation exception")
         } catch (e: Exception) {
             log.error("An exception occurred in the connection actor", e)
             exception = e
         } finally {
-            ctx.session.close(
-                if (exception != null) {
-                    CloseReason(CloseReason.Codes.INTERNAL_ERROR, "Something went wrong")
-                } else {
-                    CloseReason(CloseReason.Codes.NORMAL, "Closed")
-                }
-            )
+            val reason = if (exception != null) {
+                CloseReason(CloseReason.Codes.INTERNAL_ERROR, "Something went wrong")
+            } else {
+                CloseReason(CloseReason.Codes.NORMAL, "Closed")
+            }
 
+            logForMeOnly(ctx, "Anton Sukhonosenko's connection is about to be closed $reason")
+
+            ctx.session.close(reason)
             parent.send(MainActorMsg.ConnectionClosed(ctx.userId, ctx.session))
         }
     }
 )
+
+private fun logForMeOnly(ctx: MainActorMsg.ConnectionOpened, message: String) {
+    if (ctx.userId.spaceUserId == myUserId) {
+        log.info(message)
+    }
+}
