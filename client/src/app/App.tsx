@@ -52,9 +52,13 @@ function App() {
             webSocket = new ReconnectingWebSocket(`${protocol}://${window.location.host}/api/websocket?token=${token.token}`);
             setWs(webSocket)
 
-            interval = setInterval(() => {
+            webSocket.onopen = () => {
+                interval = setInterval(() => {
+                    webSocket.send(JSON.stringify({type: "ping"}))
+                }, 15000)
+
                 webSocket.send(JSON.stringify({type: "ping"}))
-            }, 1000)
+            }
         }
 
         return () => {

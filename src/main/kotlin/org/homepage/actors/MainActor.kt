@@ -24,8 +24,6 @@ sealed class MainActorMsg {
     class Modification(val mod: ValentineMod) : MainActorMsg()
 }
 
-const val myUserId = "1tRthh1xbcbA"
-
 fun CoroutineScope.mainActor() = actor<MainActorMsg>(capacity = 4096) {
     supervisorScope {
         val counterUpdateActor = counterUpdateActor()
@@ -42,10 +40,6 @@ fun CoroutineScope.mainActor() = actor<MainActorMsg>(capacity = 4096) {
                 }
 
                 is MainActorMsg.Modification -> {
-                    if (msg.mod.userId.spaceUserId == myUserId) {
-                        log.info("Anton Sukhonosenko has ${userToConnections[msg.mod.userId]?.size} active connections, iterating through them")
-                    }
-
                     userToConnections[msg.mod.userId]?.forEach {
                         it.inbox.trySendWithLogging(msg.mod, log, "connectionActor inbox")
                     }
