@@ -137,7 +137,10 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                 val spaceAppInstance = spaceTokenInfo.spaceAppInstance
 
                 if (params.cardType < 0 || params.cardType >= valentineTypes.size) {
-                    call.respond(HttpStatusCode.BadRequest, "Card type should be in range 0..${valentineTypes.size - 1}, got ${params.cardType}")
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        "Card type should be in range 0..${valentineTypes.size - 1}, got ${params.cardType}"
+                    )
                     return@runAuthorized
                 }
 
@@ -191,19 +194,22 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                 return@webSocket
             }
 
-            mainActor.trySendWithLogging(
-                MainActorMsg.ConnectionOpened(token.globalUserId(), this),
-                log,
-                "mainActor inbox"
-            )
+            try {
+                mainActor.trySendWithLogging(
+                    MainActorMsg.ConnectionOpened(token.globalUserId(), this),
+                    log,
+                    "mainActor inbox"
+                )
 
-            for (frame in incoming) {}
-
-            mainActor.trySendWithLogging(
-                MainActorMsg.ConnectionClosed(token.globalUserId(), this),
-                log,
-                "mainActor inbox"
-            )
+                for (frame in incoming) {
+                }
+            } finally {
+                mainActor.trySendWithLogging(
+                    MainActorMsg.ConnectionClosed(token.globalUserId(), this),
+                    log,
+                    "mainActor inbox"
+                )
+            }
         }
 
         put<Routes.ReadValentine> { params ->
@@ -249,7 +255,7 @@ fun SqlExpressionBuilder.matchUser(spaceTokenInfo: SpaceTokenInfo) =
 
 fun SqlExpressionBuilder.matchUser(userId: SpaceGlobalUserId) =
     (IncomingValentineTable.serverUrl eq userId.spaceServerUrl) and
-        (IncomingValentineTable.receiver eq userId.spaceUserId)
+            (IncomingValentineTable.receiver eq userId.spaceUserId)
 
 private fun ktorRequestAdapter(call: ApplicationCall): RequestAdapter {
     return object : RequestAdapter {

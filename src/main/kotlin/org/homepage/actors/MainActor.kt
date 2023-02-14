@@ -2,7 +2,6 @@ package org.homepage.actors
 
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.supervisorScope
@@ -37,7 +36,7 @@ fun CoroutineScope.mainActor() = actor<MainActorMsg>(capacity = 4096) {
                         mutableListOf()
                     }
 
-                    userConnections.add(connectionActor(msg))
+                    userConnections.add(connectionActor(msg, parent = channel))
                 }
 
                 is MainActorMsg.Modification -> {

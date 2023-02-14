@@ -4,6 +4,7 @@ import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
 import org.homepage.IncomingValentine
@@ -23,9 +24,11 @@ class ConnectionActor(
     val inbox: SendChannel<ValentineMod>
 )
 
-fun CoroutineScope.connectionActor(ctx: MainActorMsg.ConnectionOpened) = ConnectionActor(
+fun CoroutineScope.connectionActor(ctx: MainActorMsg.ConnectionOpened, parent: Channel<MainActorMsg>) = ConnectionActor(
     ctx.session,
     actor<ValentineMod>(capacity = 16) {
+        var exception: Exception? = null
+
         try {
             val valentines = transaction {
                 IncomingValentineTable
@@ -59,7 +62,17 @@ fun CoroutineScope.connectionActor(ctx: MainActorMsg.ConnectionOpened) = Connect
             log.info("Cancellation exception has happened in the connection actor")
         } catch (e: Exception) {
             log.error("An exception occurred in the connection actor", e)
-            ctx.session.close(CloseReason(CloseReason.Codes.INTERNAL_ERROR, "Something went wrong"))
+            exception = e
+        } finally {
+            ctx.session.close(
+                if (exception != null) {
+                    CloseReason(CloseReason.Codes.INTERNAL_ERROR, "Something went wrong")
+                } else {
+                    CloseReason(CloseReason.Codes.NORMAL, "Closed")
+                }
+            )
+
+            parent.send(MainActorMsg.ConnectionClosed(ctx.userId, ctx.session))
         }
     }
 )
