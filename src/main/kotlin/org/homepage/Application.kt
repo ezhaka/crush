@@ -13,6 +13,7 @@ import space.jetbrains.api.runtime.Space
 import space.jetbrains.api.runtime.SpaceAuthFlow
 import space.jetbrains.api.runtime.appInstallUrl
 import space.jetbrains.api.runtime.ktorClientForSpace
+import java.time.Duration
 
 private val log = LoggerFactory.getLogger("Application.kt")
 
@@ -21,6 +22,8 @@ fun Application.module() {
 
     install(WebSockets) {
         contentConverter = KotlinxWebsocketSerializationConverter(Json)
+        pingPeriod = Duration.ofSeconds(1)
+        timeout = Duration.ofSeconds(60)
     }
 
     initDbConnection()
