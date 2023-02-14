@@ -12,9 +12,10 @@ type Props = {
     valentines: Valentine[];
     initialValentine: Valentine;
     token: UserTokenData;
+    markValentineAsRead: (valentine: Valentine) => void
 }
 
-export const ValentineViewPage = ({valentines, initialValentine, token}: Props) => {
+export const ValentineViewPage = ({valentines, initialValentine, token, markValentineAsRead}: Props) => {
     const index = useMemo(() => {
         return valentines.findIndex(v => v.id == initialValentine.id)
     }, [initialValentine.id, valentines])
@@ -27,11 +28,12 @@ export const ValentineViewPage = ({valentines, initialValentine, token}: Props) 
         const fetch = async () => {
             if (token && !currentValentine.read) {
                 await httpPut(`/api/read-valentine?valentineId=${currentValentine.id}`, token.token, {})
+                markValentineAsRead(currentValentine)
             }
         }
 
         fetch().catch(console.error)
-    }, [currentValentine.id, currentValentine.read, token])
+    }, [currentValentine.id, currentValentine.read, token, markValentineAsRead])
 
     return (
         <CloseableOverlay>

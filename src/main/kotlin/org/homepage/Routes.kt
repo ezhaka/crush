@@ -5,6 +5,9 @@ object Routes {
     @Location("/api/get-profiles")
     class GetProfiles(val query: String)
 
+    @Location("/api/get-valentines")
+    class GetValentines()
+
     @Serializable
     class SendValentineBody(val receiverId: String, val messageText: String, val cardType: Int)
 

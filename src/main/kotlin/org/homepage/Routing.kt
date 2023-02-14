@@ -16,7 +16,6 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.websocket.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.channels.SendChannel
 import org.homepage.actors.MainActorMsg
@@ -92,6 +91,27 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
 
         get("/healthz") {
             call.respond(HttpStatusCode.OK)
+        }
+
+        get<Routes.GetValentines> {
+            runAuthorized { spaceTokenInfo ->
+                val valentines = transaction {
+                    IncomingValentineTable
+                        .select { matchUser(spaceTokenInfo) }
+                        .limit(1001)
+                        .orderBy(IncomingValentineTable.id, SortOrder.DESC)
+                        .map {
+                            IncomingValentine(
+                                it[IncomingValentineTable.id].value,
+                                it[IncomingValentineTable.message],
+                                it[IncomingValentineTable.cardType],
+                                it[IncomingValentineTable.read],
+                            )
+                        }
+                }
+
+                call.respond(HttpStatusCode.OK, ValentineListResponse(valentines))
+            }
         }
 
         get<Routes.GetProfiles> { params ->
@@ -178,38 +198,6 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                 log.info("Someone has sent a valentine of type '${valentineTypes[params.cardType]}' to someone")
 
                 call.respond(HttpStatusCode.OK)
-            }
-        }
-
-        webSocket("/api/websocket") {
-            val rawToken = call.parameters["token"]
-            if (rawToken == null) {
-                call.respond(HttpStatusCode.Unauthorized, "No token param is passed")
-                return@webSocket
-            }
-
-            val token = getSpaceTokenInfo(rawToken, spaceHttpClient)
-            if (token == null) {
-                call.respond(HttpStatusCode.Unauthorized, "Token is not found or invalid")
-                return@webSocket
-            }
-
-            try {
-                mainActor.trySendWithLogging(
-                    MainActorMsg.ConnectionOpened(token.globalUserId(), this),
-                    log,
-                    "mainActor inbox"
-                )
-
-                for (frame in incoming) {
-                    sendSerialized<WebsocketMessage>(WebsocketMessage.Pong())
-                }
-            } finally {
-                mainActor.trySendWithLogging(
-                    MainActorMsg.ConnectionClosed(token.globalUserId(), this),
-                    log,
-                    "mainActor inbox"
-                )
             }
         }
 

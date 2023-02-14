@@ -1,14 +1,16 @@
 import * as React from 'react';
 import {Button} from "./Button";
-import {useContext, useMemo} from "react";
+import {useContext, useEffect, useMemo} from "react";
 import {PageContext} from "./App";
 import "./Common.css"
 import "./RootPage.css"
 import {valentineTypes} from "./ValentineType";
 import {UserTokenData} from "../UserTokenData";
+import {httpGet} from "../api/http";
 
 type Props = {
     valentines: Valentine[];
+    setValentines: (valentines: Valentine[]) => void;
     token: UserTokenData;
 }
 
@@ -25,7 +27,7 @@ const IncomingValentine = ({valentine}: { valentine: Valentine }) => {
             e.preventDefault()
             setPage({kind: "valentine", valentine})
         }}>
-        {!valentine.read && <div className="new-heart" /> }
+        {!valentine.read && <div className="new-heart"/>}
         <img src={valentine.read ? src : srcUnread}/>
     </a>)
 }
@@ -36,12 +38,25 @@ const IncomingValentineRow = ({valentines}: { valentines: Valentine[] }) => {
     </div>)
 }
 
-export const RootPage = ({valentines, token}: Props) => {
+export const RootPage = ({valentines, setValentines, token}: Props) => {
     const setPage = useContext(PageContext)
 
     const rows = useMemo(() => spreadToRows(valentines), [valentines])
 
     const twoColumn = valentines && valentines.length > 0
+
+    useEffect(() => {
+        if (token?.token) {
+            httpGet(`/api/get-valentines`, token.token)
+                .then(res => {
+                    if (res.ok) {
+                        res.json().then(json => {
+                            setValentines(json.data)
+                        })
+                    }
+                })
+        }
+    }, [token?.token])
 
     return (
         <div className={twoColumn ? "root-page_two-column" : "root-page"}>

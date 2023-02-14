@@ -1,11 +1,10 @@
 import * as React from 'react';
-import {createContext, useEffect, useLayoutEffect, useRef, useState} from "react";
+import {createContext, useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
 import {fetchSpaceUserToken, UserTokenData} from "../UserTokenData";
 import {SendValentineForm} from './SendValentineForm';
 import {ValentineViewPage} from "./ValentineViewPage";
 import "./App.css"
 import {RootPage} from './RootPage';
-import ReconnectingWebSocket from "reconnecting-websocket";
 
 interface RootPage {
     kind: "root";
@@ -41,72 +40,35 @@ function App() {
     }, [])
 
     const [valentines, setValentines] = useState<Valentine[] | undefined>(undefined)
-    const [ws, setWs] = useState<ReconnectingWebSocket>()
 
-    useEffect(() => {
-        let webSocket: ReconnectingWebSocket | undefined
-        let interval: NodeJS.Timer | undefined
-
-        if (token) {
-            const protocol = window.location.hostname === 'localhost' ? 'ws' : 'wss'
-            webSocket = new ReconnectingWebSocket(`${protocol}://${window.location.host}/api/websocket?token=${token.token}`);
-            setWs(webSocket)
-
-            webSocket.onopen = () => {
-                interval = setInterval(() => {
-                    webSocket.send(JSON.stringify({type: "ping"}))
-                }, 15000)
-
-                webSocket.send(JSON.stringify({type: "ping"}))
+    const markValentineAsRead = useCallback((valentine: Valentine) => {
+        setValentines(valentines.map(v => {
+            if (v.id === valentine.id) {
+                return {...v, read: true}
+            } else {
+                return v
             }
-        }
-
-        return () => {
-            clearInterval(interval)
-            webSocket?.close()
-        }
-    }, [token])
-
-    useEffect(() => {
-        if (!ws) return
-
-        const listener = (event: MessageEvent<any>) => {
-            const message = JSON.parse(event.data)
-
-            const type = message.type;
-            const dotIndex = type.lastIndexOf('.')
-
-            switch (type.substring(dotIndex + 1)) {
-                case 'ValentineListInit': {
-                    setValentines(message.data)
-                    break
-                }
-                case 'ValentineReceived': {
-                    setValentines([message.valentine, ...(valentines || [])])
-                    break
-                }
-                case 'ValentineRead': {
-                    setValentines(valentines.map(v => v.id === message.valentineId ? {...v, read: true} : v))
-                    break
-                }
-            }
-        }
-
-        ws.addEventListener("message", listener)
-
-        return () => {
-            ws.removeEventListener("message", listener)
-        }
-    }, [ws, valentines, setValentines])
+        }))
+    }, [valentines, setValentines])
 
     return (
         <>
             <PageContext.Provider value={setPage}>
                 <div className="page">
-                    {page.kind == "root" && <RootPage valentines={valentines} token={token}/>}
+                    {page.kind == "root" &&
+                        <RootPage
+                            valentines={valentines}
+                            setValentines={setValentines}
+                            token={token}
+                        />}
                     {page.kind == "sendForm" && token && <SendValentineForm token={token}/>}
                     {page.kind == "valentine" &&
-                        <ValentineViewPage initialValentine={page.valentine} valentines={valentines} token={token}/>}
+                        <ValentineViewPage
+                            initialValentine={page.valentine}
+                            valentines={valentines}
+                            token={token}
+                            markValentineAsRead={markValentineAsRead}
+                        />}
                 </div>
             </PageContext.Provider>
         </>

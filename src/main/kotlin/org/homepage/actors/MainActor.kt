@@ -19,42 +19,17 @@ fun <T> SendChannel<T>.trySendWithLogging(element: T, logger: Logger, title: Str
 private val log: Logger = LoggerFactory.getLogger("MainActor.kt")
 
 sealed class MainActorMsg {
-    class ConnectionOpened(val userId: SpaceGlobalUserId, val session: WebSocketServerSession) : MainActorMsg()
-    class ConnectionClosed(val userId: SpaceGlobalUserId, val session: WebSocketServerSession) : MainActorMsg()
     class Modification(val mod: ValentineMod) : MainActorMsg()
 }
 
 fun CoroutineScope.mainActor() = actor<MainActorMsg>(capacity = 4096) {
     supervisorScope {
         val counterUpdateActor = counterUpdateActor()
-        val userToConnections = mutableMapOf<SpaceGlobalUserId, MutableList<ConnectionActor>>()
 
         for (msg in channel) {
             when (msg) {
-                is MainActorMsg.ConnectionOpened -> {
-                    val userConnections = userToConnections.getOrPut(msg.userId) {
-                        mutableListOf()
-                    }
-
-                    userConnections.add(connectionActor(msg, parent = channel))
-                }
-
                 is MainActorMsg.Modification -> {
-                    userToConnections[msg.mod.userId]?.forEach {
-                        it.inbox.trySendWithLogging(msg.mod, log, "connectionActor inbox")
-                    }
-
                     counterUpdateActor.trySendWithLogging(msg.mod, log, "counterUpdater inbox")
-                }
-
-                is MainActorMsg.ConnectionClosed -> {
-                    val connectionActor = userToConnections[msg.userId]
-                        ?.firstOrNull { it.session != msg.session }
-
-                    connectionActor?.let {
-                        userToConnections[msg.userId]?.remove(connectionActor)
-                        connectionActor.inbox.close()
-                    }
                 }
             }
         }
