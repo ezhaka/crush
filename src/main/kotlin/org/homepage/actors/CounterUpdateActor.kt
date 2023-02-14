@@ -116,57 +116,61 @@ private suspend fun updateStaleCounters() {
     }
 
     for ((serverUrl, receiverIds) in staleCounters.groupBy({ it.first }, { it.second })) {
-        val appInstance = transaction {
-            AppInstallationTable.select { AppInstallationTable.serverUrl eq serverUrl }.firstOrNull()?.let {
-                SpaceAppInstance(
-                    clientId = it[AppInstallationTable.clientId],
-                    clientSecret = it[AppInstallationTable.clientSecret],
-                    spaceServerUrl = it[AppInstallationTable.serverUrl],
-                )
-            }
-        } ?: continue
-
-        val client = SpaceClient(spaceHttpClient, appInstance, SpaceAuth.ClientCredentials())
-
-        val counters = transaction {
-            val unreadCountExpr = Sum(
-                Case(null).When(EqOp(IncomingValentineTable.read, booleanLiteral(false)), intLiteral(1))
-                    .Else(intLiteral(0)), IntegerColumnType()
-            ).alias("unreadCount")
-            val totalCountExpr = IncomingValentineTable.id.count()
-
-            IncomingValentineTable
-                .slice(
-                    IncomingValentineTable.receiver,
-                    totalCountExpr,
-                    unreadCountExpr
-                )
-                .select {
-                    (IncomingValentineTable.serverUrl eq serverUrl) and
-                            (IncomingValentineTable.receiver inList receiverIds)
-                }
-                .groupBy(IncomingValentineTable.receiver)
-                .map {
-                    HeartCountersIn(
-                        profileId = it[IncomingValentineTable.receiver],
-                        unreadCount = (it[unreadCountExpr] ?: 0).toLong(),
-                        totalCount = it[totalCountExpr]
+        try {
+            val appInstance = transaction {
+                AppInstallationTable.select { AppInstallationTable.serverUrl eq serverUrl }.firstOrNull()?.let {
+                    SpaceAppInstance(
+                        clientId = it[AppInstallationTable.clientId],
+                        clientSecret = it[AppInstallationTable.clientSecret],
+                        spaceServerUrl = it[AppInstallationTable.serverUrl],
                     )
                 }
-        }
+            } ?: continue
 
-        sendCounters(client, counters)
+            val client = SpaceClient(spaceHttpClient, appInstance, SpaceAuth.ClientCredentials())
 
-        transaction {
-            IncomingValentineTable.update(where = {
-                (IncomingValentineTable.serverUrl eq serverUrl) and
-                        (IncomingValentineTable.receiver inList receiverIds)
-            }) {
-                it[incomingCounterUpdated] = true
-                it[readCounterUpdated] = Case(null)
-                    .When(EqOp(readCounterUpdated, booleanLiteral(false)), booleanLiteral(true))
-                    .Else(Op.nullOp())
+            val counters = transaction {
+                val unreadCountExpr = Sum(
+                    Case(null).When(EqOp(IncomingValentineTable.read, booleanLiteral(false)), intLiteral(1))
+                        .Else(intLiteral(0)), IntegerColumnType()
+                ).alias("unreadCount")
+                val totalCountExpr = IncomingValentineTable.id.count()
+
+                IncomingValentineTable
+                    .slice(
+                        IncomingValentineTable.receiver,
+                        totalCountExpr,
+                        unreadCountExpr
+                    )
+                    .select {
+                        (IncomingValentineTable.serverUrl eq serverUrl) and
+                                (IncomingValentineTable.receiver inList receiverIds)
+                    }
+                    .groupBy(IncomingValentineTable.receiver)
+                    .map {
+                        HeartCountersIn(
+                            profileId = it[IncomingValentineTable.receiver],
+                            unreadCount = (it[unreadCountExpr] ?: 0).toLong(),
+                            totalCount = it[totalCountExpr]
+                        )
+                    }
             }
+
+            sendCounters(client, counters)
+
+            transaction {
+                IncomingValentineTable.update(where = {
+                    (IncomingValentineTable.serverUrl eq serverUrl) and
+                            (IncomingValentineTable.receiver inList receiverIds)
+                }) {
+                    it[incomingCounterUpdated] = true
+                    it[readCounterUpdated] = Case(null)
+                        .When(EqOp(readCounterUpdated, booleanLiteral(false)), booleanLiteral(true))
+                        .Else(Op.nullOp())
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Stale counters update failed for server $serverUrl", e)
         }
     }
 }
