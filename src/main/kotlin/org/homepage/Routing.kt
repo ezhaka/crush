@@ -37,6 +37,8 @@ import space.jetbrains.api.runtime.resources.teamDirectory
 import space.jetbrains.api.runtime.types.*
 import java.time.ZonedDateTime
 
+val valentineTypes = listOf("piggy", "pill", "chocolate", "cloud", "match")
+
 fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
     val log = LoggerFactory.getLogger("Routing.kt")
 
@@ -134,8 +136,8 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
             runAuthorized { spaceTokenInfo ->
                 val spaceAppInstance = spaceTokenInfo.spaceAppInstance
 
-                if (params.cardType < 0 || params.cardType > 4) {
-                    call.respond(HttpStatusCode.BadRequest, "Card type should be in range 0..4, got ${params.cardType}")
+                if (params.cardType < 0 || params.cardType >= valentineTypes.size) {
+                    call.respond(HttpStatusCode.BadRequest, "Card type should be in range 0..${valentineTypes.size - 1}, got ${params.cardType}")
                     return@runAuthorized
                 }
 
@@ -170,7 +172,7 @@ fun Application.configureRouting(mainActor: SendChannel<MainActorMsg>) {
                     "mainActor inbox"
                 )
 
-                log.info("Someone has sent a valentine to someone")
+                log.info("Someone has sent a valentine of type '${valentineTypes[params.cardType]}' to someone")
 
                 call.respond(HttpStatusCode.OK)
             }
