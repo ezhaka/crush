@@ -4,9 +4,14 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
+import org.homepage.SpaceGlobalUserId
 import org.homepage.db.AppInstallationTable
 import org.homepage.db.IncomingValentineTable
 import org.homepage.spaceHttpClient
@@ -30,17 +35,7 @@ class HeartCountersIn(
 @Serializable
 class HeartCountersBody(val counters: List<HeartCountersIn>)
 
-fun CoroutineScope.counterUpdateActor() = actor<ValentineMod>(capacity = 1024) {
-
-    log.info("Updating stale counters")
-    try {
-        updateStaleCounters()
-    } catch (e: Exception) {
-        log.error("Stale counters update failed", e)
-    }
-
-    log.info("Starting reading inbox events")
-
+fun CoroutineScope.userCounterUpdateActor() = actor<ValentineMod>(capacity = 4) {
     for (event in channel) {
         try {
             val (totalCount, unreadCount) = transaction {
@@ -60,13 +55,15 @@ fun CoroutineScope.counterUpdateActor() = actor<ValentineMod>(capacity = 1024) {
 
             val client = SpaceClient(spaceHttpClient, event.spaceServerInstance, SpaceAuth.ClientCredentials())
 
-            sendCounters(client, listOf(
-                HeartCountersIn(
-                    profileId = event.userId.spaceUserId,
-                    unreadCount = unreadCount,
-                    totalCount = totalCount
+            sendCounters(
+                client, listOf(
+                    HeartCountersIn(
+                        profileId = event.userId.spaceUserId,
+                        unreadCount = unreadCount,
+                        totalCount = totalCount
+                    )
                 )
-            ))
+            )
 
             transaction {
                 IncomingValentineTable.update(where = { IncomingValentineTable.id eq event.id }) {
@@ -78,6 +75,30 @@ fun CoroutineScope.counterUpdateActor() = actor<ValentineMod>(capacity = 1024) {
             }
         } catch (e: Exception) {
             log.error("Failed to process event $event", e)
+        }
+    }
+}
+
+fun CoroutineScope.counterUpdateActor() = actor<ValentineMod>(capacity = 1024) {
+
+    log.info("Updating stale counters")
+    try {
+        updateStaleCounters()
+    } catch (e: Exception) {
+        log.error("Stale counters update failed", e)
+    }
+
+    log.info("Starting reading inbox events")
+
+    val userActors = mutableMapOf<SpaceGlobalUserId, SendChannel<ValentineMod>>()
+
+    supervisorScope {
+        for (event in channel) {
+            val userActor = userActors.getOrPut(event.userId) {
+                userCounterUpdateActor()
+            }
+
+            userActor.send(event)
         }
     }
 }
