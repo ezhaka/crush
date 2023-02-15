@@ -109,17 +109,17 @@ private fun collectStats() {
 
     log.info("STATS: total number of people who received a valentine ${valentineRecipientsCount}")
 
-    val top3Recipients = transaction {
+    val top6Recipients = transaction {
         IncomingValentineTable
             .slice(IncomingValentineTable.receiver, IncomingValentineTable.id.count())
             .select { defaultValentineOp() }
             .groupBy(IncomingValentineTable.receiver)
             .orderBy(IncomingValentineTable.id.count(), SortOrder.DESC)
-            .limit(3)
+            .limit(6)
             .associate { it[IncomingValentineTable.receiver] to it[IncomingValentineTable.id.count()] }
     }
 
-    log.info("STATS: top 3 recipients ${top3Recipients}")
+    log.info("STATS: top 6 recipients ${top6Recipients}")
 
     val typesDistribution = transaction {
         IncomingValentineTable
