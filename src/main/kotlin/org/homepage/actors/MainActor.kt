@@ -1,16 +1,16 @@
 package org.homepage.actors
 
-import io.ktor.server.websocket.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import org.homepage.SpaceGlobalUserId
 import org.homepage.db.AppInstallationTable
+import org.homepage.db.IncomingValentineTable
 import org.homepage.setUiExtensions
 import org.homepage.spaceHttpClient
-import org.jetbrains.exposed.sql.selectAll
+import org.homepage.valentineTypes
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -30,6 +30,9 @@ private val log: Logger = LoggerFactory.getLogger("MainActor.kt")
 sealed class MainActorMsg {
     class Modification(val mod: ValentineMod) : MainActorMsg()
 }
+
+val serverUrl = "https://jetbrains.team"
+val sukhonosenkoUserId = "1tRthh1xbcbA"
 
 fun CoroutineScope.mainActor() = actor<MainActorMsg>(capacity = 4096) {
     supervisorScope {
@@ -61,6 +64,10 @@ fun CoroutineScope.mainActor() = actor<MainActorMsg>(capacity = 4096) {
             }
         }
 
+        launch {
+            collectStats()
+        }
+
         val counterUpdateActor = counterUpdateActor()
 
         for (msg in channel) {
@@ -71,4 +78,61 @@ fun CoroutineScope.mainActor() = actor<MainActorMsg>(capacity = 4096) {
             }
         }
     }
+}
+
+private fun collectStats() {
+    log.info("Collecting stats")
+
+    val totalNumberOfValentines = transaction {
+        IncomingValentineTable
+            .select { defaultValentineOp() }
+            .count()
+    }
+
+    log.info("STATS: total number of valentines ${totalNumberOfValentines}")
+
+    val totalNumberOfReadValentines = transaction {
+        IncomingValentineTable
+            .select { defaultValentineOp() and IncomingValentineTable.read }
+            .count()
+    }
+
+    log.info("STATS: total number of read valentines ${totalNumberOfReadValentines}")
+
+    val valentineRecipientsCount = transaction {
+        IncomingValentineTable
+            .slice(IncomingValentineTable.receiver)
+            .select { defaultValentineOp() }
+            .withDistinct(true)
+            .count()
+    }
+
+    log.info("STATS: total number of people who received a valentine ${valentineRecipientsCount}")
+
+    val top3Recipients = transaction {
+        IncomingValentineTable
+            .slice(IncomingValentineTable.receiver, IncomingValentineTable.id.count())
+            .select { defaultValentineOp() }
+            .groupBy(IncomingValentineTable.receiver)
+            .orderBy(IncomingValentineTable.id.count(), SortOrder.DESC)
+            .limit(3)
+            .associate { it[IncomingValentineTable.receiver] to it[IncomingValentineTable.id.count()] }
+    }
+
+    log.info("STATS: top 3 recipients ${top3Recipients}")
+
+    val typesDistribution = transaction {
+        IncomingValentineTable
+            .slice(IncomingValentineTable.cardType, IncomingValentineTable.id.count())
+            .select { defaultValentineOp() }
+            .groupBy(IncomingValentineTable.cardType)
+            .associate { valentineTypes[it[IncomingValentineTable.cardType]] to it[IncomingValentineTable.id.count()] }
+    }
+
+    log.info("STATS: types distribution ${typesDistribution}")
+}
+
+private fun SqlExpressionBuilder.defaultValentineOp(): Op<Boolean> {
+    return (IncomingValentineTable.serverUrl eq serverUrl) and
+            not((IncomingValentineTable.receiver eq sukhonosenkoUserId) and (IncomingValentineTable.cardType eq 1))
 }
