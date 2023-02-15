@@ -14,6 +14,7 @@ import kotlinx.serialization.json.*
 import org.homepage.SpaceGlobalUserId
 import org.homepage.db.AppInstallationTable
 import org.homepage.db.IncomingValentineTable
+import org.homepage.setUiExtensions
 import org.homepage.spaceHttpClient
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
